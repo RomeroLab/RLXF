@@ -17,7 +17,7 @@ from scipy.stats import spearmanr
 import csv
 
 # import helper scripts (you can change this if you want but check out https://www.nature.com/articles/s41467-024-50712-3)
-from training_MLP import (SeqFcnDataset, ProtDataModule, MLP)
+from MLP import (SeqFcnDataset, ProtDataModule, MLP)
 
 # Parameters to update
 data_filepath = ''
