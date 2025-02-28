@@ -3,6 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# ignore log files from server runs
+*.out
+
+# ignore large model files
+*.ckpt
+*.pt
+
 # C extensions
 *.so
 
