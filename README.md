@@ -37,6 +37,9 @@ Files generated:
 - **fitness_trajectory_{num_mut}mut_v{i}.csv**: contains scores for each step
 - **traj_{num_mut}mut_v{i}.png**: plots scores vs. step for trial
 - Optional: **close_sequences_{num_mut}mut_v{i}.pickle.pkl**: Use wt_functional_threshold to save sequences predicted to be have enhanced function relative to wildtype (parent sequence)
+- **traj_{num_mut}mut_v{i}.png**: plots scores vs. step for trial
+- **all_optimized_designs_from_simulated_annealing**: contains final optimized synthetic sequence from each trial
+- **unique_optimized_designs_from_simulated_annealing**: contains unique final optimized synthetic sequence for trials for SFT
 
 ## Step 3: SFT
 Supervise finetune pLM
