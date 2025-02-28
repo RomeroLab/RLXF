@@ -10,8 +10,9 @@ Perform the following steps to functionally align the protein language model (pL
 ## Step 0: Pre-process Sequence-Function Dataset  
 Ensure the sequence-function dataset file is correctly formatted before proceeding.
 - The dataset file should be named: **`SeqFxnDataset.pkl`**  
-- The column containing **amino acid sequences** must be named: **`sequence`**  
-- The column containing **functional scores** must be named: **`functional_score`**  
+- The column containing amino acid sequences must be named: **`sequence`**  
+- The column containing functional scores must be named: **`functional_score`**
+- The column listing mutations must be named: **`mutations`** with the folling format: G3E,L4N (no spaces, use 1-indexing i.e. first amino acid is M1 not M0 for start codon)
 
 ## Step 1: Train reward model
 We train an ensemble of multi-layer perceptrons to predict the log fluoresence of CreiLOV variants in a DMS dataset. Our repository is setup to train on a sequence-function dataset file (SeqFxnDataset.pkl) with a sequence and functional_score column.
