@@ -2,7 +2,9 @@
 Consolidated repository to perform RLXF
 
 Notes:
+
 SFT: Supervised finetuning
+
 PPO: Proximal policy optimization
 
 ### Step 0: Pre-process sequence-function dataset
