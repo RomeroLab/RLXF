@@ -21,7 +21,6 @@ from MLP import (SeqFcnDataset, ProtDataModule, MLP)
 
 # Parameters to update
 data_filepath = ''
-model_savepath = './trained_models/reward_models'
 num_muts_threshold = 4 # variants with this number of mutations or less will be in training set
 num_muts_of_val_test_splits = 5 # variants with this number of mutations will be split into validation and test sets
 percent_validation_split = 0.75 # percent_validation_split*100 defines percent of variants with num_muts_of_val_test_splits mutations to be in validation set
@@ -46,6 +45,7 @@ dm.save_splits(splits_path)
 dm = ProtDataModule(df, num_muts_threshold, num_muts_of_val_test_splits, percent_validation_split, batch_size, splits_path)
 
 ############################################################## train reward models ##############################################################
+model_savepath = './reward_models'
 os.makedirs(model_savepath, exist_ok=True)
 for i in range(num_models):
     model = MLP(learning_rate, batch_size, epochs, slen) # Resubstantiate the model for each training iteration
