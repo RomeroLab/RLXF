@@ -11,11 +11,9 @@ Perform the following steps to functionally align the protein language model (pL
 
 Ensure the sequence-function dataset file is correctly formatted before proceeding.
 
-## **File Naming**  
 - The dataset file should be named:  
   **`SeqFxnDataset.pkl`**  
 
-## **Column Naming**  
 - The column containing **amino acid sequences** must be named:  
   **`sequence`**  
 - The column containing **functional scores** must be named:  
