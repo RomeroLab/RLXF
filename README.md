@@ -5,10 +5,15 @@ Notes:
 SFT: Supervised finetuning
 PPO: Proximal policy optimization
 
-### Step 1: Train reward model
-We train an ensemble of multi-layer perceptrons to predict the log fluoresence of CreiLOV variants in a DMS dataset. Our repository is setup to train on a sequence_function_dataset.pkl file with a Sequence and Score column.
+### Step 0: Pre-process sequence-function dataset
+Process sequence-function dataset file to have the following filename: SeqFxnDataset.pkl
+Name the column with amino acid sequences 'sequence'
+Name the column with functional score 'functional_score'
 
-```python3 script.py > script.out```
+### Step 1: Train reward model
+We train an ensemble of multi-layer perceptrons to predict the log fluoresence of CreiLOV variants in a DMS dataset. Our repository is setup to train on a sequence-function dataset file (SeqFxnDataset.pkl) with a sequence and functional_score column.
+
+```python3 Training_Ensemble_of_reward_models.py > Training_Ensemble_of_reward_models.out```
 
 Files generated:
 
