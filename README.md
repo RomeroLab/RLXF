@@ -32,15 +32,15 @@ Generate a small, high quality synthetic sequence dataset for SFT
 ```python3 simulated_annealing.py > simulated_annealing.out```
 
 Files generated:
+- **unique_optimized_designs_from_simulated_annealing**: contains unique final optimized synthetic sequence for trials for SFT
+- **all_optimized_designs_from_simulated_annealing**: contains final optimized synthetic sequence from each trial
 - **parameters.txt**: parameters used for simulated annealing
 - **best_{num_mut}mut_v{i}.pickle**: contains best mutant found for trial
 - **fitness_trajectory_{num_mut}mut_v{i}.csv**: contains scores for each step
 - **traj_{num_mut}mut_v{i}.png**: plots scores vs. step for trial
 - Optional: **close_sequences_{num_mut}mut_v{i}.pickle.pkl**: Use wt_functional_threshold to save sequences predicted to be have enhanced function relative to wildtype (parent sequence)
 - **traj_{num_mut}mut_v{i}.png**: plots scores vs. step for trial
-- **all_optimized_designs_from_simulated_annealing**: contains final optimized synthetic sequence from each trial
-- **unique_optimized_designs_from_simulated_annealing**: contains unique final optimized synthetic sequence for trials for SFT
-
+  
 ## Step 3: SFT
 Supervise finetune pLM
 
