@@ -18,7 +18,11 @@ We train an ensemble of multi-layer perceptrons to predict the log fluoresence o
 
 ```python3 Training_Ensemble_of_reward_models.py > Training_Ensemble_of_reward_models.out```
 
-Files generated:
+Files generated
+- **SeqFxnDataset_splits.pkl**: datasplits for training, validation, and test sets
+- **Loss_Curve.png**: plots average mse for ensemble vs. epoch
+- **Test_Results.png**: plot of actual vs. predicted sequence function
+- **Test_Results.csv**: contains 'MSE', 'Pearson R', and 'Spearman's Rho' metrics for test set
 
 ## Step 2: Perform simulated annealing
 Generate a small, high quality synthetic sequence dataset for SFT
