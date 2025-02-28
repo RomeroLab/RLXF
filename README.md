@@ -1,7 +1,5 @@
 # RLXF
-Consolidated repository to perform RLXF
-
-Notes:
+Consolidated repository to perform RLXF. Perform the following steps to functionally align the pLM ESM-2
 
 SFT: Supervised finetuning
 
