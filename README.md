@@ -8,16 +8,10 @@ Perform the following steps to functionally align the protein language model (pL
 - **PPO**: Proximal Policy Optimization
 
 ## Step 0: Pre-process Sequence-Function Dataset  
-
 Ensure the sequence-function dataset file is correctly formatted before proceeding.
-
-- The dataset file should be named:  
-  **`SeqFxnDataset.pkl`**  
-
-- The column containing **amino acid sequences** must be named:  
-  **`sequence`**  
-- The column containing **functional scores** must be named:  
-  **`functional_score`**  
+- The dataset file should be named: **`SeqFxnDataset.pkl`**  
+- The column containing **amino acid sequences** must be named: **`sequence`**  
+- The column containing **functional scores** must be named: **`functional_score`**  
 
 ## Step 1: Train reward model
 We train an ensemble of multi-layer perceptrons to predict the log fluoresence of CreiLOV variants in a DMS dataset. Our repository is setup to train on a sequence-function dataset file (SeqFxnDataset.pkl) with a sequence and functional_score column.
