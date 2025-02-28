@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# coding: utf-8
 
 # Importing Packages
 import torch
@@ -19,7 +21,7 @@ class SeqFcnDataset(torch.utils.data.Dataset):
         self.data_df = data_frame
 
     def __getitem__(self, idx):
-        sequence = torch.tensor(aa2ind(list(self.data_df.Sequence.iloc[idx]))) # Extract sequence at index idx
+        sequence = torch.tensor(aa2ind(list(self.data_df.sequence.iloc[idx]))) # Extract sequence at index idx
         labels = torch.tensor(self.data_df.iloc[idx, 'functional_score'].tolist()).float() # Extract log mean fitness score for sequence at index idx and convert to a list
         return sequence, labels
 
