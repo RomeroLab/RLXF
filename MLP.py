@@ -62,7 +62,7 @@ class ProtDataModule(pl.LightningDataModule):
                 
         else:
             # New logic for splitting based on mutation count
-            self.data_df['MutationCount'] = self.data_df['Mutations'].apply(self.count_mutations)
+            self.data_df['num_mutations'] = self.data_df['mutations'].apply(self.count_mutations)
             train_indices = []
             val_indices = []
             test_indices = []
@@ -72,10 +72,10 @@ class ProtDataModule(pl.LightningDataModule):
             random.seed(0)
 
             # Proteins with 1 to 4 mutations go to training set
-            train_indices.extend(self.data_df[self.data_df['MutationCount'] <= self.num_muts_threshold].index.tolist())
+            train_indices.extend(self.data_df[self.data_df['num_mutations'] <= self.num_muts_threshold].index.tolist())
 
             # Proteins with 5 mutations are split between test and validation
-            five_mut_indices = self.data_df[self.data_df['MutationCount'] == self.num_muts_of_val_test_splits].index.tolist()
+            five_mut_indices = self.data_df[self.data_df['num_mutations'] == self.num_muts_of_val_test_splits].index.tolist()
             random.shuffle(five_mut_indices)
             split_index = int(len(five_mut_indices) * (self.percent_validation_split/100))
             val_indices.extend(five_mut_indices[:split_index])
