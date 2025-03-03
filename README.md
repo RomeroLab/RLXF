@@ -62,3 +62,19 @@ Generate designs to characterize
 
 Files generated:
 
+## Training and reproducibility notes
+- We performed RLXF on 1 NVIDIA L40S GPU
+- Packages:
+  - pytorch                   2.3.0
+  - pytorch-cuda              12.1
+  - pytorch-lightning         2.0.3
+  - pytorch-mutex             1.0
+  - torch-ema                 0.3
+  - torchaudio                2.3.0
+  - torchmetrics              1.1.2
+  - torchtext                 0.18.0
+  - torchtriton               2.3.0
+  - torchvision               0.18.0
+  - numpy                     1.26.3
+  - pandas                    1.5.3
+  - transformers              4.40.1
