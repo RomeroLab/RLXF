@@ -335,6 +335,69 @@ def generate_random_mut_non_gap_indices(WT, AA_options, num_mut, non_gap_indices
     # Return the list of random mutations as a string
     return ','.join(mutations)
 
+# Functions to process data
+def get_last_fitness_value(fitness_csv_path):
+    # Read the last value from the "Fitness" column in the CSV file
+    with open(fitness_csv_path, 'r') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        fitness_values = [float(row['Fitness']) for row in csv_reader]
+    return fitness_values[-1] if fitness_values else None
+
+def get_mutations(pickle_path):
+    # Load mutations from the pickle file
+    with open(pickle_path, 'rb') as pkl_file:
+        mutations_data = pickle.load(pkl_file)
+    return mutations_data
+
+# Define function to apply mutations to a sequence
+def apply_mutations(sequence, mutations):
+    seq_list = list(sequence)
+    for mutation in mutations:
+        position = int(mutation[1:-1])
+        new_aa = mutation[-1]
+        seq_list[position] = new_aa
+    return ''.join(seq_list)
+
+def plot_heatmap_for_configuration(df, AAs, title, save_path, WT):
+    
+    # Unzip sequences to align positions
+    alignment = tuple(zip(*df.Sequence))
+    
+    # Count AAs
+    # AA_count = np.array([[p.count(a) for a in AAs] for p in alignment]) # raw AA counts
+    AA_count = np.array([[sum(1 for seq_at_pos in alignment[pos] if seq_at_pos == a and WT[pos] != a) for a in AAs] for pos in range(len(WT))])
+
+    Magma_r = plt.cm.magma_r(np.linspace(0, 1, 256))
+    Magma_r[0] = [0, 0, 0, 0.03]  # Set the first entry (corresponding to 0 value) to white
+    # Magma_r[0] = [0.9, 0.9, 0.9, 1]  # Set the first entry (corresponding to 0 value) to grey
+    cmap = LinearSegmentedColormap.from_list("Modified_Magma_r", Magma_r, N=256)
+
+    # Plot the heatmap
+    plt.figure(figsize=(30,6))
+    heatmap = sns.heatmap(AA_count.T, cmap=cmap, square=True, linewidths=0.003, linecolor='0.7')
+    cbar = heatmap.collections[0].colorbar
+    cbar.set_label('Count of Amino Acid Mutations', fontsize=16)
+    cbar.ax.tick_params(labelsize=12)
+    pos = cbar.ax.get_position()  # Get the original position
+    cbar.ax.set_position([pos.x0 - 0.03, pos.y0, pos.width, pos.height])  # Shift the colorbar closer
+    plt.yticks(np.arange(len(AAs)) + 0.5, AAs)
+    plt.xlabel('Position', fontsize=18)
+    plt.ylabel('Amino Acid', fontsize=18)
+    plt.title(title)
+
+    # Add black dots for WT sequence
+    for pos, aa in enumerate(WT):
+        if aa in AAs:  # Check if the AA is one of the considered AAs
+            aa_index = AAs.index(aa)
+            # Plot black dot; adjust dot size with 's' as needed
+            plt.scatter(pos + 0.5, aa_index + 0.5, color='black', s=30)
+    legend_elements = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='black', markersize=10, label='WT')]
+    plt.legend(handles=legend_elements, loc='upper right')
+    
+    # Save the plot
+    plt.savefig(save_path)
+    plt.show()
+    plt.close()
 
 
 
