@@ -23,7 +23,7 @@ from MLP import (SeqFcnDataset, ProtDataModule, MLP)
 data_filepath = ''
 num_muts_threshold = 4 # variants with this number of mutations or less will be in training set
 num_muts_of_val_test_splits = 5 # variants with this number of mutations will be split into validation and test sets
-percent_validation_split = 0.75 # percent_validation_split*100 defines percent of variants with num_muts_of_val_test_splits mutations to be in validation set
+percent_validation_split = 75 # defines percent of variants with num_muts_of_val_test_splits mutations to be in validation set
 learning_rate = 1e-6
 batch_size = 128
 epochs = 2000
