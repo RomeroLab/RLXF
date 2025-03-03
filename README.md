@@ -26,8 +26,8 @@ Files generated:
 - **Test_Results.csv**: contains 'MSE', 'Pearson R', and 'Spearman's Rho' metrics for test set
 - also creates typical metrics files for each reward model in the log folder
 
-## Step 2: Perform simulated annealing
-Generate a small, high quality synthetic sequence dataset for SFT
+## Step 2: Generate synthetic sequence dataset for SFT via simulated annealing trials
+We generate a small, high quality synthetic sequence dataset via simulated annealing trials
 
 ```python3 simulated_annealing.py > simulated_annealing.out```
 
