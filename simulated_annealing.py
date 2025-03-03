@@ -19,7 +19,7 @@ import csv
 
 # import helper scripts
 from MLP import (SeqFcnDataset, ProtDataModule, MLP)
-from SA_utils import (SA_optimizer, get_non_gap_indices)
+from SA_utils import (SA_optimizer, get_non_gap_indices, get_last_fitness_value, get_mutations, apply_mutations, plot_heatmap_for_configuration)
 
 # Parameters to update
 AAs = 'ACDEFGHIKLMNPQRSTVWY-' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
@@ -124,5 +124,54 @@ for i in range(num_trials):
 
     # Save Plotted Trajectory
     sa_optimizer.plot_trajectory(savefig_name=trajectory_file)
+
+# Define filenames to load
+csv_filename_template = f'fitness_trajectory_{num_mut}mut_v{{}}.csv'
+pickle_filename_template = f'best_{num_mut}mut_v{{}}.pickle'
+files_info = {
+    f"Trial {i}": {
+        'fitness_csv': os.path.join(dir_path, csv_filename_template.format(i)),
+        'mutations_pickle': os.path.join(dir_path, pickle_filename_template.format(i))
+    }
+    for i in range(num_trials)
+}
+
+# Iterate over both files to find the max scores, mutations, and mutated sequences
+results = []
+for key, file_info in files_info.items():
+    last_fitness_value = get_last_fitness_value(file_info['fitness_csv'])
+    mutations_data = get_mutations(file_info['mutations_pickle'])
+    
+    if last_fitness_value is not None and mutations_data is not None:
+        mutations, _ = mutations_data  # Assuming mutations_data contains (mutations, array([fitness_value]))
+        mutated_sequence = apply_mutations(WT, mutations)
+        
+        results.append({
+            'Trial': key,
+            'Fitness': last_fitness_value,
+            'Mutations': mutations,
+            'Sequence': mutated_sequence
+        })
+
+# Convert results into a DataFrame and display/save
+results_df = pd.DataFrame(results)
+results_df.to_csv(f'all_optimized_designs_from_simulated_annealing.csv', index=False)
+results_df.head()
+
+# Filter to unique sequences
+unique_sequences_df = results_df.drop_duplicates(subset=['Sequence'])
+unique_sequences_df.to_csv('unique_optimized_designs_from_simulated_annealing.csv', index=False)
+unique_sequences_df.head()
+
+# Generate heatmap for amino acids vs. sequence position
+plot_heatmap_for_configuration(unique_sequences_df, AAs,
+                               'Distribution of Amino Acid Mutations for Unique Designs from Simulated Annealing',
+                               './SA_mutation_distribution.png', WT)
+plot_heatmap_for_configuration(unique_sequences_df, AAs,
+                               'Distribution of Amino Acid Mutations for Unique Designs from Simulated Annealing',
+                               './SA_mutation_distribution.svg', WT)
+
+
+
 
 
