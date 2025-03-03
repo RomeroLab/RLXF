@@ -28,7 +28,7 @@ class SeqFcnDataset(torch.utils.data.Dataset):
         aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
         aa2ind.set_default_index(20) # set unknown charcterers to gap
         sequence = torch.tensor(aa2ind(list(self.data_df.sequence.iloc[idx]))) # Extract sequence at index idx
-        labels = torch.tensor(self.data_df.iloc[idx, 'functional_score'].tolist()).float() # Extract log mean fitness score for sequence at index idx and convert to a list
+        labels = torch.tensor(self.data_df.loc[idx, 'functional_score']).float() # Extract funcitonal score
         return sequence, labels
 
     def __len__(self):
