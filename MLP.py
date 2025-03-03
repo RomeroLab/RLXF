@@ -22,6 +22,9 @@ class SeqFcnDataset(torch.utils.data.Dataset):
         self.data_df = data_frame
 
     def __getitem__(self, idx):
+        AAs = 'ACDEFGHIKLMNPQRSTVWY' # setup torchtext vocab to map AAs to indices for reward models
+        aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
+        aa2ind.set_default_index(20) # set unknown charcterers to gap
         sequence = torch.tensor(aa2ind(list(self.data_df.sequence.iloc[idx]))) # Extract sequence at index idx
         labels = torch.tensor(self.data_df.iloc[idx, 'functional_score'].tolist()).float() # Extract log mean fitness score for sequence at index idx and convert to a list
         return sequence, labels
@@ -177,6 +180,12 @@ class MLP(pl.LightningModule):
         # learning rate
         self.learning_rate = learning_rate
         self.save_hyperparameters('learning_rate', 'batch_size', 'epochs', 'slen') # log hyperparameters to file
+
+        # for predictions
+        AAs = 'ACDEFGHIKLMNPQRSTVWY' # setup torchtext vocab to map AAs to indices for reward models
+        aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
+        aa2ind.set_default_index(20) # set unknown charcterers to gap
+        self.aa2ind = aa2ind
              
     # MLP (fully-connected neural network with one hidden layer)
     def forward(self, x):
@@ -214,7 +223,7 @@ class MLP(pl.LightningModule):
         return optimizer
     
     def predict(self, sequence):
-        ind = torch.tensor(aa2ind(list(sequence))) # Convert the amino acid sequence to a tensor of indices
+        ind = torch.tensor(self.aa2ind(list(sequence))) # Convert the amino acid sequence to a tensor of indices
         x = ind.view(1,-1) # Add a batch dimension to the tensor (put here instead of forward function)
         pred = self(x) # Apply the model to the tensor to get the prediction
         return pred
