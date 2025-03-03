@@ -74,12 +74,12 @@ class SFTDataModule(pl.LightningDataModule):
 class SFT_ESM2(pl.LightningModule):
     def __init__(self, ESM2, reward_models,
                     seed,
-                    learning_rate, lr_mult, lr_mult_factor, use_scheduler, warm_restart, reinit_optimizer,
+                    learning_rate, lr_mult, lr_mult_factor,
                     WD, grad_clip_threshold, 
                     epochs,
-                    num_unfrozen_layers, num_layers_unfreeze_each_epoch, max_num_layers_unfreeze_each_epoch, training_pos_emb,
+                    num_unfrozen_layers, num_layers_unfreeze_each_epoch, max_num_layers_unfreeze_each_epoch,
                     batch_size,
-                    dataset, random_masking, model_identifier):
+                    random_masking, model_identifier):
         super().__init__()
 
         # fix random seeds for reproducibility
@@ -105,12 +105,10 @@ class SFT_ESM2(pl.LightningModule):
         self.num_unfrozen_layers = num_unfrozen_layers
         self.num_layers_unfreeze_each_epoch = num_layers_unfreeze_each_epoch
         self.max_num_layers_unfreeze_each_epoch = max_num_layers_unfreeze_each_epoch
-        self.training_pos_emb = training_pos_emb
         self.WD = WD
         self.grad_clip_threshold = grad_clip_threshold
         self.lr_mult = lr_mult
         self.lr_mult_factor = lr_mult_factor
-        self.reinit_optimizer = reinit_optimizer
         self.random_masking = random_masking
         
         # Setting up layers for training
@@ -121,10 +119,6 @@ class SFT_ESM2(pl.LightningModule):
             named_esm2_layers.append(name) # Append layer name
         named_esm2_layers.reverse()
         selected_layers = named_esm2_layers[0:self.num_unfrozen_layers]
-
-        if (self.training_pos_emb == 1 and self.max_num_layers_unfreeze_each_epoch < 103):
-            # print("here 1")
-            selected_layers.append('esm.embeddings.position_embeddings.weight')
 
         # store params & learning rates
         self.esm2_params = []
@@ -137,14 +131,10 @@ class SFT_ESM2(pl.LightningModule):
         # parameters for custom training
         self.WT = 'MAGLRHTFVVADATLPDCPLVYASEGFYAMTGYGPDEVLGHNARFLQGEGTDPKEVQKIRDAIKKGEACSVRLLNYRKDGTPFWNLLTVTPIKTPDGRVSKFVGVQVDVTSKTEGKALA' # CreiLOV
         self.automatic_optimization = False
-        self.use_scheduler = use_scheduler
-        self.warm_restart = warm_restart
         optimizers_config = self.configure_optimizers()
-        if self.use_scheduler == 1:
-            self.optimizer = optimizers_config["optimizer"]
-            self.scheduler = optimizers_config["lr_scheduler"]
-        else:
-            self.optimizer = optimizers_config
+        self.optimizer = optimizers_config["optimizer"]
+        self.scheduler = optimizers_config["lr_scheduler"]
+        
         self.generated_sequences = set()
 
         self.save_hyperparameters(ignore=["ESM2", "reward_models"]) # log hyperparameters to file
@@ -204,8 +194,7 @@ class SFT_ESM2(pl.LightningModule):
         
         self.log('train_loss', loss, on_step=True, on_epoch=False, prog_bar=False, logger=True, batch_size=self.batch_size)
         
-        if self.use_scheduler == 1:
-            self.lr_scheduler_step(self.scheduler, 0, None)
+        self.lr_scheduler_step(self.scheduler, 0, None)
 
         last_batch = batch_idx == self.trainer.num_training_batches - 1
         if last_batch:
@@ -269,17 +258,8 @@ class SFT_ESM2(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.esm2_params, weight_decay=self.WD)
-        if self.use_scheduler == 1:
-            if self.warm_restart == 1:
-                scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=1)
-                return {"optimizer": optimizer,
-                        "lr_scheduler": {"scheduler": scheduler}}
-            
-            else:
-                scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=self.epochs)
-                return {"optimizer": optimizer, "lr_scheduler": {"scheduler": scheduler}}
-        
-        return optimizer # No scheduler
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=1)
+        return {"optimizer": optimizer, "lr_scheduler": {"scheduler": scheduler}}
 
     def on_train_epoch_end(self):
         """ Occurs at the end of each epoch """
@@ -300,10 +280,6 @@ class SFT_ESM2(pl.LightningModule):
         named_esm2_layers.reverse()
         selected_layers = named_esm2_layers[0:self.num_unfrozen_layers]
 
-        if (self.training_pos_emb == 1 and self.max_num_layers_unfreeze_each_epoch < 103):
-            # print("here 2")
-            selected_layers.append('esm.embeddings.position_embeddings.weight')
-
         # Add new layer parameters to the optimizer without reinitializing it
         for name in selected_layers:
             layer_params = [p for n, p in self.model_being_updated.named_parameters() if n == name and p.requires_grad and p not in current_params]
@@ -311,14 +287,6 @@ class SFT_ESM2(pl.LightningModule):
                 self.optimizer.add_param_group({'params': layer_params,'lr': self.learning_rate})
                 current_params.update(set(layer_params))
             self.learning_rate *= self.lr_mult
-
-        if self.reinit_optimizer == 1:
-            optimizers_config = self.configure_optimizers()
-            if self.use_scheduler == 1:
-                self.optimizer = optimizers_config["optimizer"]
-                self.scheduler = optimizers_config["lr_scheduler"]
-            else:
-                self.optimizer = optimizers_config
 
         # Report gradient max norm
         max_norm = 0

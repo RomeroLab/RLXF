@@ -25,30 +25,40 @@ from SFT_ESM2 import (SFT_ESM2, SFTDataModule)
 # Parameters to update
 WT = 'MAGLRHTFVVADATLPDCPLVYASEGFYAMTGYGPDEVLGHNARFLQGEGTDPKEVQKIRDAIKKGEACSVRLLNYRKDGTPFWNLLTVTPIKTPDGRVSKFVGVQVDVTSKTEGKALA' # CreiLOV
 sequence_length = len(WT)
-num_models = 100
-dataset = 1
-max_num_layers_unfreeze_each_epoch = 82
-warm_restart = 1
-use_scheduler = 1
-reinit_optimizer = 0
-training_pos_emb = 0
-batch_size = 8
+num_reward_models = 100
+
+# model parameters
 model_identifier ='esm2_t33_650M_UR50D' # esm2_t6_8M_UR50D # esm2_t12_35M_UR50D # esm2_t30_150M_UR50D # esm2_t33_650M_UR50D
+max_num_layers_unfreeze_each_epoch = 82 # max number of layers in ESM2 (650M) that will be trained
+num_unfrozen_layers = 25 # initial number of layers of ESM2 unlocked
+num_layers_unfreeze_each_epoch = 1 # numbers of layers of ESM2 to unlock each epoch until max_num_layers_unfreeze_each_epoch reached
+
+# SFT parameters
+seed = 42
+batch_size = 8
 epochs = 1
+random_masking =  0 # adding random masks (1) or not (0) to sequence dataset
+
+# optimizer hyperparameters
 learning_rate = 0.0051114990195524
+lr_mult_factor = 1.5704059582871683
+lr_mult = 0.8897135219977205
 WD = 0.003506385543831778
 grad_clip_threshold = 3
-lr_mult_factor = 1.5704059582871683
-num_layers_unfreeze_each_epoch = 1
-lr_mult = 0.8897135219977205
-num_unfrozen_layers = 25
-random_masking =  0 # 0 # 1 # 1
+
+# parameters for generating designs after alignment
+num_designs = 100
+num_muts = 5
+high_conf_threshold = 0.9
+cum_prob_threshold = 0.25
+ep = epochs - 1
+generation_seed = 7028
+predicted_wt_score = 1.1498 # predicted wildtype score as reference for evaluations
 
 # send models to device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Make models reproducible
-seed=42
 os.environ['PYTHONHASHSEED'] = str(seed) # Set the PYTHONHASHSEED environment variable to the chosen seed to make hash-based operations predictable
 np.random.seed(seed) # Set NumPy's random seed to ensure reproducibility of operations using NumPy's random number generator
 random.seed(seed) # Set Python's built-in random module's seed to ensure reproducibility of random operations using Python's random functions
@@ -61,7 +71,7 @@ torch.set_float32_matmul_precision('medium')
 
 # load ensemble of reward models
 models = []
-for i in range(num_models):
+for i in range(num_reward_models):
     model_name = f"reward_model_v{i}.ckpt"
     checkpoint_path = f"./reward_models/{model_name}"
     reward_model = MLP.load_from_checkpoint(checkpoint_path)
@@ -75,7 +85,7 @@ ESM2 = AutoModelForMaskedLM.from_pretrained(f"facebook/{model_identifier}")
 ESM2 = ESM2.to(device)
 
 # Load preference data
-df = pd.read_pickle("./SFT_dataset_all_unique_designs_from_SA.pkl") # load preprocessed CreiLOV data
+df = pd.read_pickle("./unique_optimized_designs_from_simulated_annealing.csv") # load preprocessed CreiLOV data
 
 ############################################################################################################################################################
 
@@ -84,7 +94,7 @@ logger_name = f'SFT_{model_identifier}'
 logger = CSVLogger('logs', name=logger_name, version=None)
 version = logger.version # Retrieve the version number from the logger
 dm = SFTDataModule(df, batch_size, seed)
-model = SFT_ESM2(ESM2, reward_models, seed, learning_rate, lr_mult, lr_mult_factor, use_scheduler, warm_restart, reinit_optimizer, WD, grad_clip_threshold, epochs, num_unfrozen_layers, num_layers_unfreeze_each_epoch, max_num_layers_unfreeze_each_epoch, training_pos_emb, batch_size, dataset, random_masking, model_identifier)
+model = SFT_ESM2(ESM2, reward_models, seed, learning_rate, lr_mult, lr_mult_factor, WD, grad_clip_threshold, epochs, num_unfrozen_layers, num_layers_unfreeze_each_epoch, max_num_layers_unfreeze_each_epoch, batch_size, random_masking, model_identifier)
 trainer = pl.Trainer(logger=logger, max_epochs=epochs, enable_progress_bar=False, log_every_n_steps=1, accelerator = "gpu", devices = 1)
 trainer.fit(model,dm)
 
@@ -134,19 +144,11 @@ print('Saved learning curves')
 
 with torch.no_grad():
 
-    # Generate designs
-    num_designs = 100
-    num_muts = 5
-    high_conf_threshold = 0.9
-    cum_prob_threshold = 0.25 # 0.1
-    seed = 7028
-    filepath = f'./logs/{logger_name}'
-
     # Load fixed and sft models
     fixed_model = AutoModelForMaskedLM.from_pretrained(f"facebook/{model_identifier}")
 
     # Generate and evaluate 1000 designs with 5 mutants
-    fixed_mutated_seqs, fixed_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, fixed_model, model_identifier, tokenizer, filepath, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, seed)
+    fixed_mutated_seqs, fixed_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, fixed_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
     print(f"Status: finished generating sequences with fixed {model_identifier}")
 
     Save mutants from ESM2
@@ -164,7 +166,7 @@ with torch.no_grad():
     sft_model.load_state_dict(state_dict)
 
     # Generate and evaluate 1000 designs with 5 mutants from both models
-    sft_mutated_seqs, sft_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, sft_model, model_identifier, tokenizer, filepath, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, seed)
+    sft_mutated_seqs, sft_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, sft_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
     print(f"Status: finished generating sequences with sft {model_identifier}")
 
     # Save mutants from ESM2
@@ -201,9 +203,6 @@ with torch.no_grad():
 
     # Plot histogram
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
-
-    # Constants for the mean and standard deviation
-    predicted_wt_score = 4.1498
 
     # Plot histograms for the models
     sns.histplot(np.median(fixed_scores_np, axis=0), bins=25, alpha=0.4, color='grey', edgecolor='black', stat='density', ax=ax1, label='Pre-trained ESM2')
