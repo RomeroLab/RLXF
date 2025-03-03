@@ -38,51 +38,44 @@ from functions import (generate_df, generate_and_evaluate_mutants_p_sampling)
 
 ################################################## hyperparameters ##################################################
 
-# Parameters to update
+# parameters to update
 sft_logger_version = 7
 model_identifier ='esm2_t33_650M_UR50D' # esm2_t6_8M_UR50D # esm2_t12_35M_UR50D # esm2_t30_150M_UR50D # esm2_t33_650M_UR50D
 num_reward_models = 100 # We have an ensemble of 100 MLP reward models
 
 # model architexture dependent
-max_num_layers_unfreeze_each_epoch = 82 # The max number of layers in ESM2 (650M) that will be aligned cannot exceed 82 -> We can go to at least 71 with bs = 10 on our GPU's @ Duke
-num_unfrozen_layers = 27 # 82 # initial number of layers of ESM2 unlocked
+max_num_layers_unfreeze_each_epoch = 82 # max number of layers in ESM2 (650M) that will be trained
+num_unfrozen_layers = 27 # initial number of layers of ESM2 unlocked
 num_layers_unfreeze_each_epoch = 69 # numbers of layers of ESM2 to unlock each epoch until max_num_layers_unfreeze_each_epoch reached
-training_pos_emb = 0 # do not train positional embeddings
-epoch_threshold_to_unlock_ESM2 = 1
+epoch_threshold_to_unlock_ESM2 = 1 # interval of epochs to unlock more layers of ESM2
 
 # learning rate 
 learning_rate = 0.008656618973037239
 lr_mult = 0.8847762860054206
 lr_mult_factor = 1
-warm_restart = 1 # with warm restart
-use_scheduler = 1 # with scheduler
 
 # optimizer hyperparameters
 WD = 0.009951801658490985
-clip_type = 1 # with gradient clipping
 grad_clip_threshold = 6.824466143373183
 grad_clip_threshold_factor = 1.2
 
 # training hyperparameters
 seed = 2549
-batch_size = 1 # Loading WT to dataloader, we generate variant designs each batch so only load WT initially to models
 epochs = 2
 iterations = 1
 num_updates = max(1, int((epochs / 100) * iterations)) # First restart occurs at 10 epochs (backprop will have occured 10*iterations times)
 
 # generating design hyperparameters
 WT = 'MAGLRHTFVVADATLPDCPLVYASEGFYAMTGYGPDEVLGHNARFLQGEGTDPKEVQKIRDAIKKGEACSVRLLNYRKDGTPFWNLLTVTPIKTPDGRVSKFVGVQVDVTSKTEGKALA'
-num_sequences = 2 # initial batch size
+num_sequences = 2 # initial batch size during PPO
 inc_batch_size = 1 # increasing batch size each epoch until max_batch_size reached
 max_batch_size = 10 # max batch size (dependent on GPU memory)
-num_mutations = 15
+num_mutations = 15 # number of mutations to add to WT
 high_conf_threshold = 0.9 # initial probability threshold to be considered high confidence mutation
 cum_prob_threshold = 0.22164310879955906 # initial cumulative probability threshold of non-WT resides to be considered candidate position to explore mutating
 
 # important PPO hyperparameters
-average_type = 2
-average_type_loss = 0
-rel_to_WT = 1
+rel_to_WT = 1 # compare designs to WT or pretrained designs
 epsilon = 0.17377598245568548 # clipping parameter for PPO loss
 
 # total reward hyperparameters
@@ -91,9 +84,6 @@ dkl_scale_init = 1e-8 # initial weight for Dkl
 dkl_scale = 1e-7 # weight term for Dkl after 1st epoch
 
 # hyparameters regarding model saving
-reduce_EMA_impact = 1
-decay = 0.8
-saving_models_threshold = 1.012 # previous best -0.51171875 # do not save models if at 10 # 1.01812135525 # 4.225/4.1498 = generated design fitness / predicted WT fitness
 filepath = 'PPO'
 save_filepath = f'./logs/{filepath}'
 
@@ -103,7 +93,7 @@ num_muts = 5
 high_conf_threshold = 0.9
 cum_prob_threshold = 0.25
 ep = epochs - 1
-seed = 7028
+generation_seed = 7028
 predicted_wt_score = 1.1498 # predicted wildtype score as reference for evaluations
 
 ################################################## hyperparameters ##################################################
@@ -181,16 +171,16 @@ else:
 # Align with PPO
 logger = CSVLogger('logs', name=f"PPO_{model_identifier}")
 version = logger.version
-dm = ProtDataModuleESM2(WT, batch_size, seed)
+dm = ProtDataModuleESM2(WT, batch_size=1, seed=seed) # Loading WT to dataloader, we generate variant designs each batch so only load WT initially to models
 model = PPO_ESM2(model_identifier, sft_model, rl_updated_model, reward_models, tokenizer, num_reward_models, sft_model_path, # model selections
-                num_unfrozen_layers, num_layers_unfreeze_each_epoch, max_num_layers_unfreeze_each_epoch, training_pos_emb, # model dependent hyperparameters
-                seed, batch_size, epochs, iterations, num_updates, # training hyperparameters
-                learning_rate, lr_mult, lr_mult_factor, use_scheduler, warm_restart, # learning rate hyperparameters
-                WD, clip_type, grad_clip_threshold, grad_clip_threshold_factor, # optimizer hyperparameters
+                num_unfrozen_layers, num_layers_unfreeze_each_epoch, max_num_layers_unfreeze_each_epoch, # model dependent hyperparameters
+                seed, epochs, iterations, num_updates, # training hyperparameters
+                learning_rate, lr_mult, lr_mult_factor, # learning rate hyperparameters
+                WD, grad_clip_threshold, grad_clip_threshold_factor, # optimizer hyperparameters
                 WT, num_sequences, inc_batch_size, max_batch_size, num_mutations, high_conf_threshold, cum_prob_threshold, # generating design hyperparameters
-                average_type_loss, average_type, rel_to_WT, epsilon, # important PPO hyperparameters
+                rel_to_WT, epsilon, # important PPO hyperparameters
                 pairwise_hd_aver_factor, dkl_scale, dkl_scale_init, # total reward hyperparameters
-                reduce_EMA_impact, decay, saving_models_threshold, filepath, version, # hyparameters regarding model saving
+                filepath, version, # hyparameters regarding model saving
                 epoch_threshold_to_unlock_ESM2)
 if strategy == "ddp":
     trainer = pl.Trainer(
@@ -271,7 +261,7 @@ print('saved learning curves from aligned model')
 fixed_model = AutoModelForMaskedLM.from_pretrained(f"facebook/{model_identifier}")
 
 # Generate and evaluate 1000 designs with 5 mutants
-fixed_mutated_seqs, fixed_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, fixed_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, seed)
+fixed_mutated_seqs, fixed_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, fixed_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
 print(f"Status: finished generating sequences with fixed {model_identifier}")
 
 # Save mutants from ESM2
@@ -289,7 +279,7 @@ state_dict = torch.load(f'{sft_model_path}')
 sft_model.load_state_dict(state_dict)
 
 # Generate and evaluate 1000 designs with 5 mutants from both models
-sft_mutated_seqs, sft_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, sft_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, seed)
+sft_mutated_seqs, sft_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, sft_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
 print(f"Status: finished generating sequences with sft {model_identifier}")
 
 # Save mutants from ESM2
@@ -337,7 +327,7 @@ state_dict = torch.load(f'./logs/{filepath}/version_{version}/ema_aligned_{model
 rl_model.load_state_dict(state_dict)
 
 # Generate and evaluate 1000 designs with 5 mutants from both models
-rl_mutated_seqs, rl_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, rl_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, seed)
+rl_mutated_seqs, rl_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, rl_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
 print(f"Status: finished generating sequences with sft {model_identifier}")
 
 # Save mutants from ESM2

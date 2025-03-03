@@ -18,7 +18,6 @@ import seaborn as sns
 import random
 from random import choice
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 from sklearn import metrics
 import os
 import pickle
@@ -26,35 +25,24 @@ from transformers import AutoModelForMaskedLM, AutoTokenizer
 from MLP import MLP
 import itertools
 import copy
-import warnings
-import optuna
 import logging
 import sys
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
-import matplotlib.patches as mpatches
 from torch_ema import ExponentialMovingAverage
-import gc
-
-# Define amino acid dictionary for tokenization, define WT for length of context window
-AAs = 'ACDEFGHIKLMNPQRSTVWY' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
-WT = 'MAGLRHTFVVADATLPDCPLVYASEGFYAMTGYGPDEVLGHNARFLQGEGTDPKEVQKIRDAIKKGEACSVRLLNYRKDGTPFWNLLTVTPIKTPDGRVSKFVGVQVDVTSKTEGKALA' # CreiLOV
-aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
-aa2ind.set_default_index(20) # set unknown charcterers to gap
-sequence_length = len(WT)
 
 # Running RLXF
 class PPO_ESM2(pl.LightningModule):
     def __init__(self,
                 model_identifier, sft_model, rl_updated_model, reward_models, tokenizer, num_reward_models, sft_model_path, # model selections
-                num_unfrozen_layers, num_layers_unfreeze_each_epoch, max_num_layers_unfreeze_each_epoch, training_pos_emb, # model dependent hyperparameters
-                seed, batch_size, epochs, iterations, num_updates, # training hyperparameters
-                learning_rate, lr_mult, lr_mult_factor, use_scheduler, warm_restart, # learning rate hyperparameters
-                WD, clip_type, grad_clip_threshold, grad_clip_threshold_factor, # optimizer hyperparameters
+                num_unfrozen_layers, num_layers_unfreeze_each_epoch, max_num_layers_unfreeze_each_epoch, # model dependent hyperparameters
+                seed, epochs, iterations, num_updates, # training hyperparameters
+                learning_rate, lr_mult, lr_mult_factor, # learning rate hyperparameters
+                WD, grad_clip_threshold, grad_clip_threshold_factor, # optimizer hyperparameters
                 WT, num_sequences, inc_batch_size, max_batch_size, num_mutations, high_conf_threshold, cum_prob_threshold, # generating design hyperparameters
-                average_type_loss, average_type, rel_to_WT, epsilon, # important PPO hyperparameters
+                rel_to_WT, epsilon, # important PPO hyperparameters
                 pairwise_hd_aver_factor, dkl_scale, dkl_scale_init, # total reward hyperparameters
-                reduce_EMA_impact, decay, saving_models_threshold, filepath, logger_version, # hyparameters regarding model saving
+                filepath, logger_version, # hyparameters regarding model saving
                 epoch_threshold_to_unlock_ESM2):
         super().__init__()
 
@@ -63,15 +51,16 @@ class PPO_ESM2(pl.LightningModule):
         self.fixed_model = sft_model
         self.rl_updated_model = rl_updated_model
         self.reward_models = reward_models
+        AAs = 'ACDEFGHIKLMNPQRSTVWY' # setup torchtext vocab to map AAs to indices for reward models
+        aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
+        aa2ind.set_default_index(20) # set unknown charcterers to gap
+        self.aa2ind = aa2ind
         self.tokenizer = tokenizer
         self.num_reward_models = num_reward_models
         self.sft_model_path = sft_model_path
 
         # Hyperparameters regarding model saving
-        self.reduce_EMA_impact = reduce_EMA_impact
-        self.decay = decay
-        self.ema = ExponentialMovingAverage(self.rl_updated_model.parameters(), decay=self.decay)
-        self.saving_models_threshold = saving_models_threshold
+        self.ema = ExponentialMovingAverage(self.rl_updated_model.parameters(), decay=0.8)
         self.filepath = filepath
         self.logger_version = logger_version
 
@@ -79,7 +68,6 @@ class PPO_ESM2(pl.LightningModule):
         self.num_unfrozen_layers = num_unfrozen_layers
         self.num_layers_unfreeze_each_epoch = num_layers_unfreeze_each_epoch
         self.max_num_layers_unfreeze_each_epoch = max_num_layers_unfreeze_each_epoch
-        self.training_pos_emb = training_pos_emb
         named_esm2_layers = []
         self.rl_updated_model.to(self.device)
         for idx, (name, param) in enumerate(self.rl_updated_model.named_parameters()):
@@ -102,15 +90,11 @@ class PPO_ESM2(pl.LightningModule):
         self.learning_rate_0 = learning_rate
         self.lr_mult = lr_mult
         self.lr_mult_factor = lr_mult_factor
-        self.use_scheduler = use_scheduler
-        self.warm_restart = warm_restart
 
         # Optimizer hyperparameters and configure optimizer
         self.WD = WD
-        self.clip_type = clip_type
-        if self.clip_type == 1:
-            self.grad_clip_threshold = grad_clip_threshold
-            self.grad_clip_threshold_factor = grad_clip_threshold_factor
+        self.grad_clip_threshold = grad_clip_threshold
+        self.grad_clip_threshold_factor = grad_clip_threshold_factor
         self.automatic_optimization = False
         self.esm2_params = []
         for idx, name in enumerate(selected_layers):
@@ -121,11 +105,8 @@ class PPO_ESM2(pl.LightningModule):
 
         self.rl_updated_model.to('cpu') # Do not need to clear cache. 0 MB freed
         optimizers_config = self.configure_optimizers()
-        if self.use_scheduler == 1:
-            self.optimizer = optimizers_config["optimizer"]
-            self.scheduler = optimizers_config["lr_scheduler"]
-        else:
-            self.optimizer = optimizers_config
+        self.optimizer = optimizers_config["optimizer"]
+        self.scheduler = optimizers_config["lr_scheduler"]
 
         # Generating design hyperparameters
         self.WT = WT
@@ -138,8 +119,6 @@ class PPO_ESM2(pl.LightningModule):
 
         # Important PPO hyperparameters
         self.eps = epsilon
-        self.average_type_loss = average_type_loss
-        self.average_type = average_type
         self.rel_to_WT = rel_to_WT
 
         # Total reward hyperparameters
@@ -153,7 +132,7 @@ class PPO_ESM2(pl.LightningModule):
         self.fixed_sequences_with_high_confidence_mutations = None
         self.fixed_candidate_positions = None
         self.fixed_normalized_weights = None
-        
+
         # Save hyperparameters, excluding certain arguments
         self.save_hyperparameters(ignore=["sft_model", "rl_updated_model", "reward_models", "tokenizer"]) # log hyperparameters to file
 
@@ -174,10 +153,7 @@ class PPO_ESM2(pl.LightningModule):
         total_reward = (fitness_advantage + self.pairwise_hd_aver_factor*pairwise_hd_aver - current_beta * dkl_value)
         
         # Calculate PPO loss and backpropagate
-        if self.average_type_loss == 0:
-            ppo_loss = (self.clipped_loss(ratios, total_reward)).mean()
-        else:
-           ppo_loss = (self.clipped_loss(ratios, total_reward)).median()
+        ppo_loss = (self.clipped_loss(ratios, total_reward)).mean()
         self.rl_updated_model.to(self.device)
         self.optimizer.zero_grad()
         ppo_loss.backward()
@@ -193,10 +169,9 @@ class PPO_ESM2(pl.LightningModule):
         #     if param.requires_grad and param.grad is not None:
         #         print(f"{name}: Grad Norm = {param.grad.norm().item()}")
 
-        if self.clip_type == 1:
-            torch.nn.utils.clip_grad_norm_(self.rl_updated_model.parameters(), self.grad_clip_threshold)
-            # clip_value = torch.nn.utils.clip_grad_norm_(self.rl_updated_model.parameters(), self.grad_clip_threshold)
-            # print(f"Total Gradient Norm After Clipping: {clip_value}")
+        torch.nn.utils.clip_grad_norm_(self.rl_updated_model.parameters(), self.grad_clip_threshold)
+        # clip_value = torch.nn.utils.clip_grad_norm_(self.rl_updated_model.parameters(), self.grad_clip_threshold)
+        # print(f"Total Gradient Norm After Clipping: {clip_value}")
 
         # # Log gradient norms after clipping
         # print("Gradient Norms After Clipping:")
@@ -206,8 +181,7 @@ class PPO_ESM2(pl.LightningModule):
 
 
         self.optimizer.step()
-        if self.use_scheduler == 1:
-            self.lr_scheduler_step(self.scheduler['scheduler'], 0, None)
+        self.lr_scheduler_step(self.scheduler['scheduler'], 0, None)
         self.ema.to(self.device)
         self.ema.update()
         self.rl_updated_model.to('cpu')
@@ -237,25 +211,15 @@ class PPO_ESM2(pl.LightningModule):
             ratios = self.action(new_log_states=new_log_states, masked_pos=masked_pos, sampled_idxs=sampled_idxs, rl_high_conf_mutations=rl_high_conf_mutations, rl_high_conf_seq=rl_high_conf_seq, fixed_probs=fixed_probs)
             
             # Calculate PPO loss and backpropagate
-            if self.average_type_loss == 0:
-                ppo_loss = (self.clipped_loss(ratios, total_reward)).mean() # Calculate PPO loss
-            else:
-               ppo_loss = (self.clipped_loss(ratios, total_reward)).median() # Calculate PPO loss
+            ppo_loss = (self.clipped_loss(ratios, total_reward)).mean() # Calculate PPO loss
             self.rl_updated_model.to(self.device)
             self.optimizer.zero_grad()
             ppo_loss.backward()
-            if self.clip_type == 1:
-                torch.nn.utils.clip_grad_norm_(self.rl_updated_model.parameters(), self.grad_clip_threshold/self.grad_clip_threshold_factor)
+            torch.nn.utils.clip_grad_norm_(self.rl_updated_model.parameters(), self.grad_clip_threshold/self.grad_clip_threshold_factor)
             self.optimizer.step()
-            if self.use_scheduler == 1:
-                self.lr_scheduler_step(self.scheduler['scheduler'], 0, None)
+            self.lr_scheduler_step(self.scheduler['scheduler'], 0, None)
             
-            if self.reduce_EMA_impact == 1:
-                print('skipping EMA beyond 1st iteration')
-            else:
-                self.ema.to(self.device)
-                self.ema.update()
-                self.ema.to('cpu')
+            # skipping EMA beyond 1st iteration
             
             self.rl_updated_model.to('cpu')
             
@@ -271,12 +235,6 @@ class PPO_ESM2(pl.LightningModule):
             self.log("mean_ratio_final_iter", mean_ratio_iter, prog_bar=True, logger=True, on_step=True, on_epoch=False)
             self.log("median_ratio_final_iter", median_ratio_iter, prog_bar=False, logger=True, on_step=True, on_epoch=False)
             self.log("ppo_loss_final_iter", ppo_loss_final_iter, prog_bar=True, logger=True, on_step=True, on_epoch=False)
-
-        # # Only save on rank 0 (first GPU in DDP setup) every 25 epochs
-        # elif self.current_epoch % 2 == 0 and self.global_rank == 0:
-        #     # Use the logger version number in the filename
-        #     self.save_rl_updated_esm2()
-        #     print(f'Saving model at epoch {self.current_epoch}')
         
         # Use the logger version number in the filename
         self.save_rl_updated_esm2()
@@ -294,7 +252,6 @@ class PPO_ESM2(pl.LightningModule):
             sequence = self.WT
         
         # Pre-allocate a tensor filled with zeros for the initial log probabilities
-        # all_tokens = self.tokenizer.get_vocab().keys()
         initial_log_states = torch.zeros((len(sequence), 20), dtype=torch.bfloat16).to(self.device)
         
         with torch.no_grad():
@@ -336,7 +293,6 @@ class PPO_ESM2(pl.LightningModule):
             sequence = self.WT
 
         # Pre-allocate a tensor filled with zeros for the new log probabilities
-        # all_tokens = self.tokenizer.get_vocab().keys()
         new_log_states = torch.zeros((len(sequence), 20), dtype=torch.bfloat16).to(self.device)
         
         with torch.no_grad():
@@ -807,12 +763,12 @@ class PPO_ESM2(pl.LightningModule):
                 model.eval()  # Set the model to evaluation mode
 
                 for j, seq in enumerate(mutated_seqs):
-                    sequence = torch.tensor(aa2ind(list(seq))).to(self.device)  # Convert amino acids to indices
+                    sequence = torch.tensor(self.aa2ind(list(seq))).to(self.device)  # Convert amino acids to indices
                     score = model.predict(sequence)[0][0]  # Extract score for the sequence from the current model
                     scores_tensor[i, j] = score
 
                 for j, seq in enumerate(pretrained_mutated_seqs):
-                    sequence = torch.tensor(aa2ind(list(seq))).to(self.device)  # Convert amino acids to indices
+                    sequence = torch.tensor(self.aa2ind(list(seq))).to(self.device)  # Convert amino acids to indices
                     score = model.predict(sequence)[0][0]  # Extract score for the sequence from the current model
                     pre_scores_tensor[i, j] = score
 
@@ -835,23 +791,7 @@ class PPO_ESM2(pl.LightningModule):
         print(f"Fitness Values > Predicted WT: {valid_fitness}")
 
         # Compute the overall fitness score based on average_type
-        if self.average_type == 0:
-            rl_fitness = rl_fitness_per_sequence.mean()
-            if self.rel_to_WT == 0:
-                pre_fitness = pre_fitness_per_sequence.mean()
-        elif self.average_type == 1:
-            rl_fitness = rl_fitness_per_sequence.median()
-            if self.rel_to_WT == 0:
-                pre_fitness = pre_fitness_per_sequence.median()
-        elif self.average_type == 2:
-            rl_fitness = rl_fitness_per_sequence.max()
-            if self.rel_to_WT == 0:
-                pre_fitness = pre_fitness_per_sequence.max()
-        elif self.average_type == 3:
-            rl_fitness = rl_fitness_per_sequence.min()
-            if self.rel_to_WT == 0:
-                pre_fitness = pre_fitness_per_sequence.min()
-
+        rl_fitness = rl_fitness_per_sequence.max()
         rel_WT_fitness = rl_fitness / predicted_WT_fitness
 
         if self.rel_to_WT == 1:
@@ -886,18 +826,12 @@ class PPO_ESM2(pl.LightningModule):
         """ Configure optimizers and optionally a scheduler with warm restarts. """
         optimizer = torch.optim.Adam(self.esm2_params, weight_decay = self.WD)
         # print(self.esm2_params)
-        if self.use_scheduler == 1:
-            if self.warm_restart == 1: # If using scheduler for learning rate with warm restart
-                T_0 = self.num_updates # Number of updates within the first cycle
-                T_mult = 2  # interval between decay cycles is constant
-                scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0, T_mult)
-                return {"optimizer": optimizer, "lr_scheduler": {"scheduler": scheduler}}
-            else:
-                scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=self.epochs)
-                return {"optimizer": optimizer, "lr_scheduler": {"scheduler": scheduler}}
-        # No scheduler
-        else:
-            return optimizer
+
+        T_0 = self.num_updates # Number of updates within the first cycle
+        T_mult = 2  # interval between decay cycles is constant
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0, T_mult)
+        return {"optimizer": optimizer, "lr_scheduler": {"scheduler": scheduler}}
+
 
     def lr_scheduler_step(self, scheduler, optimizer_idx, metric):
         """ Manually steppings learning rate scheduler. """
@@ -933,9 +867,6 @@ class PPO_ESM2(pl.LightningModule):
                 named_esm2_layers.append(name) # Append layer name
             named_esm2_layers.reverse()
             selected_layers = named_esm2_layers[0:self.num_unfrozen_layers]
-            if (self.training_pos_emb == 1 and self.max_num_layers_unfreeze_each_epoch < 103): # This technically applies to ESM2 35M, but we never go deeper than this for all models
-                # print("here 2")
-                selected_layers.append('esm.embeddings.position_embeddings.weight')
 
             # Add new layer parameters to the optimizer without reinitializing it
             for name in selected_layers:
@@ -1043,7 +974,7 @@ class PPO_ESM2(pl.LightningModule):
         batch_size = len(mutated_seqs)
         protein_tensors = torch.zeros((batch_size, len(self.WT)), dtype=torch.bfloat16).to(self.device)
         for i, seq in enumerate(mutated_seqs):
-            protein_tensors[i] = torch.tensor(aa2ind(list(seq))).to(self.device)
+            protein_tensors[i] = torch.tensor(self.aa2ind(list(seq))).to(self.device)
             # print('protein_tensors', protein_tensors[i])
 
         n = protein_tensors.size(0)
