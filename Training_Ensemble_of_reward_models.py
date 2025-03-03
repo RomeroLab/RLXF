@@ -33,7 +33,7 @@ WT = 'MAGLRHTFVVADATLPDCPLVYASEGFYAMTGYGPDEVLGHNARFLQGEGTDPKEVQKIRDAIKKGEACSVRLL
 slen = len(WT) # length of parent sequence
 
 # load data
-df = pd.read_pickle(f"{data_filepath}/SeqFxnDataset.pkl") # load preprocessed data with Sequence and Score column
+df = pd.read_pickle(f"{data_filepath}SeqFxnDataset.pkl") # load preprocessed data with Sequence and Score column
 # df.head()
 
 # create data splits for SeqFxnDataset
