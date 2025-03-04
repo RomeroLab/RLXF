@@ -19,7 +19,7 @@ import csv
 
 # import helper scripts
 from MLP import (SeqFcnDataset, ProtDataModule, MLP)
-from simulated_annealing_utils import (SA_optimizer, get_non_gap_indices, get_last_fitness_value, get_mutations, apply_mutations, plot_heatmap_for_configuration)
+from simulated_annealing_utils import (seq_function_handler, SA_optimizer, get_non_gap_indices, get_last_fitness_value, get_mutations, apply_mutations, plot_heatmap_for_configuration)
 
 # Parameters to update
 AAs = 'ACDEFGHIKLMNPQRSTVWY-' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
