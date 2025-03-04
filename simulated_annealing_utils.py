@@ -12,6 +12,8 @@ import pytorch_lightning as pl
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 from torchtext import vocab
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 import os
 import random
 import pickle
