@@ -20,7 +20,6 @@ import csv
 # Set up Amino Acid Dictionary of Indices
 AAs = 'ACDEFGHIKLMNPQRSTVWY-' 
 aa2ind = Vocab(OrderedDict([(a, 1) for a in AAs]))
-aa2ind.set_default_index(20)  
 
 # Simulated Annealing Class
 class SA_optimizer:
@@ -169,7 +168,6 @@ class seq_function_handler:
 
         AAs = 'ACDEFGHIKLMNPQRSTVWY-'
         aa2ind = Vocab(OrderedDict([(a, 1) for a in AAs]))  # Explicitly set specials=[]
-        aa2ind.set_default_index(20)  
         self.aa2ind = aa2ind
         
     def seq2fitness(self, seq):
