@@ -25,7 +25,7 @@ from SFT_ESM2 import (SFT_ESM2, SFTDataModule)
 # Parameters to update
 WT = 'MAGLRHTFVVADATLPDCPLVYASEGFYAMTGYGPDEVLGHNARFLQGEGTDPKEVQKIRDAIKKGEACSVRLLNYRKDGTPFWNLLTVTPIKTPDGRVSKFVGVQVDVTSKTEGKALA' # CreiLOV
 sequence_length = len(WT)
-num_reward_models = 2 # 100
+num_reward_models = 100
 
 # model parameters
 model_identifier ='esm2_t33_650M_UR50D' # esm2_t6_8M_UR50D # esm2_t12_35M_UR50D # esm2_t30_150M_UR50D # esm2_t33_650M_UR50D
@@ -37,7 +37,7 @@ num_layers_unfreeze_each_epoch = 1 # numbers of layers of ESM2 to unlock each ep
 seed = 42
 batch_size = 8
 epochs = 1
-random_masking =  0 # adding random masks (1) or not (0) to sequence dataset
+random_masking = 0 # adding random masks (1) or not (0) to sequence dataset
 
 # optimizer hyperparameters
 learning_rate = 0.0051114990195524
@@ -47,7 +47,7 @@ WD = 0.003506385543831778
 grad_clip_threshold = 3
 
 # parameters for generating designs after alignment
-num_designs = 2 # 100
+num_designs = 100
 num_muts = 5
 high_conf_threshold = 0.9
 cum_prob_threshold = 0.25
@@ -91,7 +91,6 @@ df = pd.read_pickle("./unique_optimized_designs_from_simulated_annealing.pkl") #
 # Apply mutation masking
 df['Masked_Sequence'] = df['Sequence'].apply(lambda seq: mask_mutations(seq, WT))
 # print(df.head(1))
-
 
 ############################################################################################################################################################
 
