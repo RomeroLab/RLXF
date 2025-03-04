@@ -171,13 +171,13 @@ class seq_function_handler:
         labels = []
 
         # Convert the sequence to tensor representation
-        sequence_tensor = torch.tensor([self.aa2ind[a] for a in seq], dtype=torch.long)
+        # sequence_tensor = torch.tensor([self.aa2ind[a] for a in seq], dtype=torch.long)
 
         # Score Sequence for all models
         with torch.no_grad():
             for model in self.models:
                 model.eval()  # Set model to evaluation mode
-                pred_Y = model.predict(sequence_tensor.unsqueeze(0)).cpu().numpy().astype(float)  # Predict Label Scores
+                pred_Y = model.predict(seq).cpu().numpy().astype(float)  # Predict Label Scores
                 labels.append(pred_Y)  # Append label scores for each enzyme from all models
 
         # Calculate lower confidence bound for all labels across all models
