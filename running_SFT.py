@@ -85,7 +85,7 @@ ESM2 = AutoModelForMaskedLM.from_pretrained(f"facebook/{model_identifier}")
 ESM2 = ESM2.to(device)
 
 # Load preference data
-df = pd.read_pickle("./unique_optimized_designs_from_simulated_annealing.csv") # load preprocessed CreiLOV data
+df = pd.read_pickle("./unique_optimized_designs_from_simulated_annealing.pkl") # load preprocessed CreiLOV data
 
 ############################################################################################################################################################
 

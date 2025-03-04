@@ -156,21 +156,21 @@ for key, file_info in files_info.items():
 
 # Convert results into a DataFrame and display/save
 results_df = pd.DataFrame(results)
-results_df.to_csv(f'all_optimized_designs_from_simulated_annealing.csv', index=False)
+results_df.to_pickle(f'all_optimized_designs_from_simulated_annealing.pkl', index=False)
 results_df.head()
 
 # Filter to unique sequences
 unique_sequences_df = results_df.drop_duplicates(subset=['Sequence'])
-unique_sequences_df.to_csv('unique_optimized_designs_from_simulated_annealing.csv', index=False)
+unique_sequences_df.to_pickle('unique_optimized_designs_from_simulated_annealing.pkl', index=False)
 unique_sequences_df.head()
 
 # Generate heatmap for amino acids vs. sequence position
 plot_heatmap_for_configuration(unique_sequences_df, AAs,
                                'Distribution of Amino Acid Mutations for Unique Designs from Simulated Annealing',
-                               './SA_mutation_distribution.png', WT)
+                               './simulated_annealing_results/SA_mutation_distribution.png', WT)
 plot_heatmap_for_configuration(unique_sequences_df, AAs,
                                'Distribution of Amino Acid Mutations for Unique Designs from Simulated Annealing',
-                               './SA_mutation_distribution.svg', WT)
+                               './simulated_annealing_results/SA_mutation_distribution.svg', WT)
 
 
 
