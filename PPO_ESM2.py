@@ -922,9 +922,9 @@ class PPO_ESM2(pl.LightningModule):
         path_to_ema_model = f'{base_path}/ema_aligned_{self.model_identifier}_v{version}_ep{self.current_epoch}.pt'
 
         try:
-            # Save the non-EMA version of the model
-            torch.save(self.rl_updated_model.state_dict(), path_to_non_ema_model)
-            print(f"Saved non-EMA {self.model_identifier} model to {path_to_non_ema_model}")
+            # # Save the non-EMA version of the model
+            # torch.save(self.rl_updated_model.state_dict(), path_to_non_ema_model)
+            # print(f"Saved non-EMA {self.model_identifier} model to {path_to_non_ema_model}")
 
             # Save the EMA version of the model
             self.ema.store(self.rl_updated_model.parameters())  # Store the original weights of rl_updated_model
