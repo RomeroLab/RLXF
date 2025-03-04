@@ -41,7 +41,7 @@ from functions import (generate_df, generate_and_evaluate_mutants_p_sampling)
 # parameters to update
 sft_logger_version = 0
 model_identifier ='esm2_t33_650M_UR50D' # esm2_t6_8M_UR50D # esm2_t12_35M_UR50D # esm2_t30_150M_UR50D # esm2_t33_650M_UR50D
-num_reward_models = 2 # 100 # We have an ensemble of 100 MLP reward models
+num_reward_models = 100 # We have an ensemble of 100 MLP reward models
 
 # model architexture dependent
 max_num_layers_unfreeze_each_epoch = 82 # max number of layers in ESM2 (650M) that will be trained
@@ -88,7 +88,7 @@ filepath = 'PPO'
 save_filepath = f'./logs/{filepath}_{model_identifier}'
 
 # parameters for generating designs after alignment
-num_designs = 2 # 100
+num_designs = 100
 num_muts = 5
 high_conf_threshold = 0.9
 cum_prob_threshold = 0.25
