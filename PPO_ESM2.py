@@ -762,13 +762,11 @@ class PPO_ESM2(pl.LightningModule):
                 model.eval()  # Set the model to evaluation mode
 
                 for j, seq in enumerate(mutated_seqs):
-                    sequence = torch.tensor(self.aa2ind(list(seq))).to(self.device)  # Convert amino acids to indices
-                    score = model.predict(sequence)[0][0]  # Extract score for the sequence from the current model
+                    score = model.predict(seq)[0][0]  # Extract score for the sequence from the current model
                     scores_tensor[i, j] = score
 
                 for j, seq in enumerate(pretrained_mutated_seqs):
-                    sequence = torch.tensor(self.aa2ind(list(seq))).to(self.device)  # Convert amino acids to indices
-                    score = model.predict(sequence)[0][0]  # Extract score for the sequence from the current model
+                    score = model.predict(seq)[0][0]  # Extract score for the sequence from the current model
                     pre_scores_tensor[i, j] = score
 
         # Unload all reward models from the GPU
