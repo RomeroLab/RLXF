@@ -173,11 +173,6 @@ class seq_function_handler:
         # Score Sequence for all models
         with torch.no_grad():
             for model in self.models:
-
-                # Ensure seq is on the same device as the model before passing it to predict()
-                device = next(model.parameters()).device  
-                seq = seq.to(device)  # Move sequence to correct device
-            
                 model.eval()  # Set model to evaluation mode
                 pred_Y = model.predict(seq).cpu().numpy().astype(float)  # Predict Label Scores
                 labels.append(pred_Y)  # Append label scores for each enzyme from all models

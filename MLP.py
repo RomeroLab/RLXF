@@ -225,7 +225,8 @@ class MLP(pl.LightningModule):
         return optimizer
     
     def predict(self, sequence):
-        ind = torch.tensor(self.aa2ind(list(sequence))) # Convert the amino acid sequence to a tensor of indices
+        device = next(self.parameters()).device
+        ind = torch.tensor(self.aa2ind(list(sequence))).to(device) # Convert the amino acid sequence to a tensor of indices
         x = ind.view(1,-1) # Add a batch dimension to the tensor (put here instead of forward function)
         pred = self(x) # Apply the model to the tensor to get the prediction
         return pred
