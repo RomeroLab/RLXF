@@ -50,7 +50,7 @@ Files generated:
 ## Step 3: SFT
 Supervise finetune pLM
 
-```python3 script.py > script.out```
+```python3 running_SFT.py > running_SFT.out```
 
 Files generated:
 - **logs/SFT_{model_identifier}**
@@ -64,16 +64,10 @@ Files generated:
 ## Step 4: Perform PPO
 Align SFT-pLM with proximal policy optimization
 
-```python3 script.py > script.out```
+```python3 running_PPO.py > running_PPO.out```
 
 Files generated:
 
-## Step 5: Generate designs
-Generate designs to characterize
-
-```python3 script.py > script.out```
-
-Files generated:
 
 ## Training and reproducibility notes
 - We trained the ensemble of reward models on one NVIDIA RTX A4500 GPU and performed simulated annealing on AMD EPYC 7302 16-Core Processor CPUs.
