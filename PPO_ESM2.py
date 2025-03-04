@@ -1125,11 +1125,11 @@ class PPO_ESM2(pl.LightningModule):
         plt.legend(handles=legend_elements, loc='upper right')
         plt.tight_layout()
         if sequence is self.WT:
-            plt.savefig(f'{filepath}/version_{version}/single_mut_probs_for_{muts_rel_WT}_from_{model_identifier}_ep{self.current_epoch}.png')
-            plt.savefig(f'{filepath}/version_{version}/single_mut_probs_for_{muts_rel_WT}_from_{model_identifier}_ep{self.current_epoch}.svg')
+            plt.savefig(f'{filepath}_{model_identifier}/version_{version}/single_mut_probs_for_{muts_rel_WT}_from_{model_identifier}_ep{self.current_epoch}.png')
+            plt.savefig(f'{filepath}_{model_identifier}/version_{version}/single_mut_probs_for_{muts_rel_WT}_from_{model_identifier}_ep{self.current_epoch}.svg')
         else:
-            plt.savefig(f'{filepath}/version_{version}/single_mut_probs_for_high_conf_{muts_rel_WT}_from_{model_identifier}_ep{self.current_epoch}.png')
-            plt.savefig(f'{filepath}/version_{version}/single_mut_probs_for_high_conf_{muts_rel_WT}_from_{model_identifier}_ep{self.current_epoch}.svg')
+            plt.savefig(f'{filepath}_{model_identifier}/version_{version}/single_mut_probs_for_high_conf_{muts_rel_WT}_from_{model_identifier}_ep{self.current_epoch}.png')
+            plt.savefig(f'{filepath}_{model_identifier}/version_{version}/single_mut_probs_for_high_conf_{muts_rel_WT}_from_{model_identifier}_ep{self.current_epoch}.svg')
         plt.close()
         
     def print_tensor_devices(self):
