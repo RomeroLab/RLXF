@@ -26,10 +26,10 @@ from simulated_annealing_utils import (seq_function_handler, SA_optimizer, get_n
 AAs = 'ACDEFGHIKLMNPQRSTVWY-'
 WT = 'MAGLRHTFVVADATLPDCPLVYASEGFYAMTGYGPDEVLGHNARFLQGEGTDPKEVQKIRDAIKKGEACSVRLLNYRKDGTPFWNLLTVTPIKTPDGRVSKFVGVQVDVTSKTEGKALA' # parent sequence
 wt_functional_threshold = None # find the predicted function of parent sequence with ensemble of reward models if you want to find more sequences
-num_models = 2 # 100 # number of models in ensemble
-num_trials = 2 # 100 # number of simulated annealing trials
+num_models = 100 # number of models in ensemble
+num_trials = 100 # number of simulated annealing trials
 num_mut = 5 # number of mutations ideally for the number of mutations in the designs you want to characterize after functional alignment
-nsteps = 500 # 50000 # number of steps during simulated annealing
+nsteps = 50000 # number of steps during simulated annealing
 mut_rate = 2 # number of mutations per step
 start_temp = -1.6 # initial temperature, this may need to be optimized for your functional score - ideally have 30-60% of accepting random mutations at first
 final_temp = -3.1 # final temperature, this may need to be optimized for your functional score

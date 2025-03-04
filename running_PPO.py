@@ -303,8 +303,8 @@ with open(f'./logs/{filepath}/version_{version}/sft_{model_identifier}_mutated_s
     sft_mutated_seqs = file.read().splitlines()
 
 # Generate DataFrames
-df_sft = generate_df(sft_mutated_seqs, np.median(sft_scores_np, axis=0))
-df_fixed = generate_df(fixed_mutated_seqs, np.median(fixed_scores_np, axis=0))
+df_sft = generate_df(sft_mutated_seqs, np.median(sft_scores_np, axis=0), WT)
+df_fixed = generate_df(fixed_mutated_seqs, np.median(fixed_scores_np, axis=0), WT)
 
 # Save to CSV
 df_sft.to_csv(f'./logs/{filepath}/version_{version}/{model_identifier}_sft_mutated_designs_scores.csv', index=False)
@@ -344,7 +344,7 @@ with open(f'./logs/{filepath}/version_{version}/ema_aligned_{model_identifier}_m
     rl_mutated_seqs = file.read().splitlines()
 
 # Generate DataFrames
-df_rl = generate_df(rl_mutated_seqs, np.median(rl_scores_np, axis=0))
+df_rl = generate_df(rl_mutated_seqs, np.median(rl_scores_np, axis=0), WT)
 
 # Save to CSV
 df_rl.to_csv(f'./logs/{filepath}/version_{version}/ema_aligned_{model_identifier}_mutated_designs_scores_ep{ep}.csv', index=False)
