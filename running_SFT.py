@@ -25,7 +25,7 @@ from SFT_ESM2 import (SFT_ESM2, SFTDataModule)
 # Parameters to update
 WT = 'MAGLRHTFVVADATLPDCPLVYASEGFYAMTGYGPDEVLGHNARFLQGEGTDPKEVQKIRDAIKKGEACSVRLLNYRKDGTPFWNLLTVTPIKTPDGRVSKFVGVQVDVTSKTEGKALA' # CreiLOV
 sequence_length = len(WT)
-num_reward_models = 100
+num_reward_models = 2 # 100
 
 # model parameters
 model_identifier ='esm2_t33_650M_UR50D' # esm2_t6_8M_UR50D # esm2_t12_35M_UR50D # esm2_t30_150M_UR50D # esm2_t33_650M_UR50D
