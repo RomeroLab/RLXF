@@ -53,7 +53,7 @@ Supervise finetune pLM
 ```python3 running_SFT.py > running_SFT.out```
 
 Files generated:
-- **logs/SFT_{model_identifier}**
+- **logs/SFT_{model_identifier}/version_{version}**: folder containing the following
   - **SFT_{model_identifier}.pt**: SFT pLM saved as .pt file
   - **{model_identifier}_fixed_mutated_designs_scores.csv**, **fixed_{model_identifier}_mutated_seqs.txt**, and **fixed_{model_identifier}_scores.npy**: sequence designs and scores from fixed model
   - **{model_identifier}_sft_mutated_designs_scores.csv**, **sft_{model_identifier}_mutated_seqs.txt**, and **sft_{model_identifier}_scores.npy**: sequence designs and scores from SFT model
@@ -67,7 +67,13 @@ Align SFT-pLM with proximal policy optimization
 ```python3 running_PPO.py > running_PPO.out```
 
 Files generated:
-
+- **logs/PPO_{model_identifier}/version_{version}**: folder containing the following
+  - **ema_aligned_{model_identifier}_v{version}_ep{epoch}.pt**: SFT pLM saved as .pt file, saved each epoch by default
+  - **esm2_t33_650M_UR50D_design_scores_ep1.png/svg**: kdeplot of designs from pretrained, sft, and aligned models
+  - **ema_aligned_{model_identifier}_mutated_designs_scores_ep1.csv**, **ema_aligned_{model_identifier}_mutated_seqs.txt**, and **ema_aligned_{model_identifier}_scores.npy**: sequence designs and scores from aligned model
+  - **{model_identifier}_fixed_mutated_designs_scores.csv**, **fixed_{model_identifier}_mutated_seqs.txt**, and **fixed_{model_identifier}_scores.npy**: sequence designs and scores from fixed model
+  - **{model_identifier}_sft_mutated_designs_scores.csv**, **sft_{model_identifier}_mutated_seqs.txt**, and **sft_{model_identifier}_scores.npy**: sequence designs and scores from SFT model
+  - single_mutant_probability_heatmaps: single mutant probabilities from pretrained or SFT pLM for wildtype sequenece or amino acid sequence with high confidence mutations each epoch of training and during generation
 
 ## Training and reproducibility notes
 - We trained the ensemble of reward models on one NVIDIA RTX A4500 GPU and performed simulated annealing on AMD EPYC 7302 16-Core Processor CPUs.
