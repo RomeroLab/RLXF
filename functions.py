@@ -27,15 +27,12 @@ import enum
 import csv
 import os
 import pickle
-from sklearn.model_selection import train_test_split
-from Bio import AlignIO
 import math
 import pathlib
 import warnings
 from MLP import MLP
 from transformers import AutoModelForMaskedLM, AutoTokenizer
 from matplotlib.colors import LinearSegmentedColormap
-from conv_vae_model import ConvVAE
 
 # Training on GPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
