@@ -261,7 +261,7 @@ print('saved learning curves from aligned model')
 fixed_model = AutoModelForMaskedLM.from_pretrained(f"facebook/{model_identifier}")
 
 # Generate and evaluate 1000 designs with 5 mutants
-fixed_mutated_seqs, fixed_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, fixed_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
+fixed_mutated_seqs, fixed_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, fixed_model, model_identifier, tokenizer, f'{filepath}_{model_identifier}', ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
 print(f"Status: finished generating sequences with fixed {model_identifier}")
 
 # Save mutants from ESM2
@@ -279,7 +279,8 @@ state_dict = torch.load(f'{sft_model_path}')
 sft_model.load_state_dict(state_dict)
 
 # Generate and evaluate 1000 designs with 5 mutants from both models
-sft_mutated_seqs, sft_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, sft_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
+sft_model_identifier = f"SFT_{model_identifier}"
+sft_mutated_seqs, sft_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, sft_model, sft_model_identifier, tokenizer, f'{filepath}_{model_identifier}', ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
 print(f"Status: finished generating sequences with sft {model_identifier}")
 
 # Save mutants from ESM2
@@ -327,8 +328,8 @@ state_dict = torch.load(f'{save_filepath}/version_{version}/ema_aligned_{model_i
 rl_model.load_state_dict(state_dict)
 
 # Generate and evaluate 1000 designs with 5 mutants from both models
-rl_model_identifier = f"SFT_{model_identifier}"
-rl_mutated_seqs, rl_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, rl_model, rl_model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
+rl_model_identifier = f"aligned_{model_identifier}"
+rl_mutated_seqs, rl_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, rl_model, rl_model_identifier, tokenizer, f'{filepath}_{model_identifier}', ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
 print(f"Status: finished generating sequences with sft {model_identifier}")
 
 # Save mutants from ESM2
