@@ -88,7 +88,7 @@ filepath = 'PPO'
 save_filepath = f'./logs/{filepath}'
 
 # parameters for generating designs after alignment
-num_designs = 100
+num_designs = 2 # 100
 num_muts = 5
 high_conf_threshold = 0.9
 cum_prob_threshold = 0.25
