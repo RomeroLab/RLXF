@@ -79,7 +79,6 @@ class PPO_ESM2(pl.LightningModule):
 
         # Training hyperparameters
         self.seed = seed
-        self.batch_size = batch_size
         self.epochs = epochs
         self.epoch_threshold_to_unlock_ESM2 = epoch_threshold_to_unlock_ESM2
         self.iterations = iterations
