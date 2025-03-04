@@ -917,7 +917,7 @@ class PPO_ESM2(pl.LightningModule):
         
         version = self.logger_version if hasattr(self.logger, 'version') else 'unknown_version'
         device_name = "cuda" if torch.cuda.is_available() else "cpu"
-        base_path = f'./logs/{self.filepath}/version_{version}'
+        base_path = f'./logs/{self.filepath}_{self.model_identifier}/version_{version}'
         path_to_non_ema_model = f'{base_path}/non_ema_aligned_{self.model_identifier}_v{version}_ep{self.current_epoch}.pt'
         path_to_ema_model = f'{base_path}/ema_aligned_{self.model_identifier}_v{version}_ep{self.current_epoch}.pt'
 
