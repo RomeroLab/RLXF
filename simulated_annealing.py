@@ -19,7 +19,20 @@ import csv
 
 # import helper scripts
 from MLP import (SeqFcnDataset, ProtDataModule, MLP)
+# from simulated_annealing_utils import (seq_function_handler, SA_optimizer, get_non_gap_indices, get_last_fitness_value, get_mutations, apply_mutations, plot_heatmap_for_configuration)
+
+from simulated_annealing_utils import (seq_function_handler)
+print('made it here 1')
+from simulated_annealing_utils import (seq_function_handler, SA_optimizer)
+print('made it here 2')
+from simulated_annealing_utils import (seq_function_handler, SA_optimizer, get_non_gap_indices)
+print('made it here 3')
+from simulated_annealing_utils import (seq_function_handler, SA_optimizer, get_non_gap_indices, get_last_fitness_value)
+print('made it here 4')
+from simulated_annealing_utils import (seq_function_handler, SA_optimizer, get_non_gap_indices, get_last_fitness_value, get_mutations, apply_mutations)
+print('made it here 5')
 from simulated_annealing_utils import (seq_function_handler, SA_optimizer, get_non_gap_indices, get_last_fitness_value, get_mutations, apply_mutations, plot_heatmap_for_configuration)
+print('made it here 6')
 
 # Parameters to update
 AAs = 'ACDEFGHIKLMNPQRSTVWY-' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
@@ -33,8 +46,6 @@ mut_rate = 2 # number of mutations per step
 start_temp = -1.6 # initial temperature, this may need to be optimized for your functional score - ideally have 30-60% of accepting random mutations at first
 final_temp = -3.1 # final temperature, this may need to be optimized for your functional score
 seed = 1
-
-print('made it here')
 
 # use seed for reproducibility
 random.seed(seed)
