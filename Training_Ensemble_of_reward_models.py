@@ -45,7 +45,7 @@ dm.save_splits(splits_path)
 dm = ProtDataModule(df, num_muts_threshold, num_muts_of_val_test_splits, percent_validation_split, batch_size, splits_path)
 
 # ############################################################## train reward models ##############################################################
-# model_savepath = './reward_models'
+model_savepath = './reward_models'
 # os.makedirs(model_savepath, exist_ok=True)
 # for i in range(num_models):
 #     model = MLP(learning_rate, batch_size, epochs, slen) # Resubstantiate the model for each training iteration
