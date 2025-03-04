@@ -53,6 +53,14 @@ Supervise finetune pLM
 ```python3 script.py > script.out```
 
 Files generated:
+- **logs/SFT_{model_identifier}**
+  - **SFT_{model_identifier}.pt**: SFT pLM saved as .pt file
+  - **{model_identifier}_fixed_mutated_designs_scores.csv**, **fixed_{model_identifier}_mutated_seqs.txt**, and **fixed_{model_identifier}_scores.npy**: sequence designs and scores from fixed model
+  - **{model_identifier}_sft_mutated_designs_scores.csv**, **sft_{model_identifier}_mutated_seqs.txt**, and **sft_{model_identifier}_scores.npy**: sequence designs and scores from fixed model
+  - **esm2_t33_650M_UR50D_metrics_vs_steps.png/svg**: various metrics vs. epoch monitored during SFT
+  - metrics and hyperparameters for each reward model
+  - single_mutant_probability_heatmaps: single mutant probabilities from pretrained or SFT pLM for wildtype sequenece or amino acid sequence with high confidence mutations
+  - 
 
 ## Step 4: Perform PPO
 Align SFT-pLM with proximal policy optimization
