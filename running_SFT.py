@@ -70,14 +70,14 @@ torch.backends.cudnn.benchmark = False # Prevent cuDnn from using any algorithms
 torch.set_float32_matmul_precision('medium')
 
 # load ensemble of reward models
-models = []
+reward_models = []
 for i in range(num_reward_models):
     model_name = f"reward_model_v{i}.ckpt"
     checkpoint_path = f"./reward_models/{model_name}"
     reward_model = MLP.load_from_checkpoint(checkpoint_path)
     for param in reward_model.parameters():
         param.requires_grad = False
-    models.append(reward_model)
+    reward_models.append(reward_model)
     
 # load ESM2
 tokenizer = AutoTokenizer.from_pretrained(f"facebook/{model_identifier}")
