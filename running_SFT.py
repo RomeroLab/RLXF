@@ -106,6 +106,7 @@ trainer.fit(model,dm)
 
 # Save the sft_updated_esm2 model when training is done, appending the version number to the filename
 model.save_sft_updated_esm2(f'./logs/{logger_name}/version_{version}/SFT_{model_identifier}_v{version}.pt')
+save_filepath = f'./logs/{logger_name}/version_{version}'
 
 ############################################################################################################################################################
 
