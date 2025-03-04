@@ -172,7 +172,7 @@ class seq_function_handler:
         labels = []
 
         # Convert the sequence to tensor representation for model prediction
-        sequence_tensor = torch.tensor([self.aa2ind[a] for a in seq], dtype=torch.long, device=device).unsqueeze(0)
+        sequence_tensor = torch.tensor([self.aa2ind[a] for a in seq], dtype=torch.long).unsqueeze(0)
 
         # Score Sequence for all models
         with torch.no_grad():
