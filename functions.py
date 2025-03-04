@@ -274,6 +274,9 @@ def generate_and_evaluate_mutants_p_sampling(WT, reward_models, model, model_ide
     # print(mutated_seqs)
  
     # Score mutants
+    AAs = 'ACDEFGHIKLMNPQRSTVWY-' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
+    aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
+    aa2ind.set_default_index(20) # set unknown charcterers to gap
     batch_size = num_designs
     scores_tensor = torch.zeros((len(reward_models), batch_size), dtype=torch.float32).to(device)
     for i, reward_model in enumerate(reward_models):

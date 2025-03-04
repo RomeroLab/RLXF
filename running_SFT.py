@@ -47,7 +47,7 @@ WD = 0.003506385543831778
 grad_clip_threshold = 3
 
 # parameters for generating designs after alignment
-num_designs = 100
+num_designs = 10 # 100
 num_muts = 5
 high_conf_threshold = 0.9
 cum_prob_threshold = 0.25
