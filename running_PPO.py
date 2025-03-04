@@ -39,9 +39,9 @@ from functions import (generate_df, generate_and_evaluate_mutants_p_sampling)
 ################################################## hyperparameters ##################################################
 
 # parameters to update
-sft_logger_version = 7
+sft_logger_version = 0
 model_identifier ='esm2_t33_650M_UR50D' # esm2_t6_8M_UR50D # esm2_t12_35M_UR50D # esm2_t30_150M_UR50D # esm2_t33_650M_UR50D
-num_reward_models = 100 # We have an ensemble of 100 MLP reward models
+num_reward_models = 2 # 100 # We have an ensemble of 100 MLP reward models
 
 # model architexture dependent
 max_num_layers_unfreeze_each_epoch = 82 # max number of layers in ESM2 (650M) that will be trained
