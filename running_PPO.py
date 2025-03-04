@@ -327,7 +327,8 @@ state_dict = torch.load(f'./logs/{filepath}/version_{version}/ema_aligned_{model
 rl_model.load_state_dict(state_dict)
 
 # Generate and evaluate 1000 designs with 5 mutants from both models
-rl_mutated_seqs, rl_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, rl_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
+rl_model_identifier = f"SFT_{model_identifier}"
+rl_mutated_seqs, rl_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, rl_model, rl_model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
 print(f"Status: finished generating sequences with sft {model_identifier}")
 
 # Save mutants from ESM2
