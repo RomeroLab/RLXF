@@ -294,7 +294,7 @@ def generate_and_evaluate_mutants_p_sampling(WT, reward_models, model, model_ide
     return mutated_seqs, scores_np
 
 # Generate DataFrames for RL, SFT, and Fixed sequences
-def generate_df(sequences, scores):
+def generate_df(sequences, scores, WT):
     mutations_list = []
     num_mutations_list = []
     

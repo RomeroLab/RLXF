@@ -47,7 +47,7 @@ WD = 0.003506385543831778
 grad_clip_threshold = 3
 
 # parameters for generating designs after alignment
-num_designs = 10 # 100
+num_designs = 2 # 100
 num_muts = 5
 high_conf_threshold = 0.9
 cum_prob_threshold = 0.25
@@ -199,8 +199,8 @@ with torch.no_grad():
         sft_mutated_seqs = file.read().splitlines()
 
     # Generate DataFrames
-    df_sft = generate_df(sft_mutated_seqs, np.median(sft_scores_np, axis=0))
-    df_fixed = generate_df(fixed_mutated_seqs, np.median(fixed_scores_np, axis=0))
+    df_sft = generate_df(sft_mutated_seqs, np.median(sft_scores_np, axis=0), WT)
+    df_fixed = generate_df(fixed_mutated_seqs, np.median(fixed_scores_np, axis=0), WT)
 
     # Save to CSV
     df_sft.to_csv(f'./logs/{logger_name}/version_{version}/{model_identifier}_sft_mutated_designs_scores.csv', index=False)
