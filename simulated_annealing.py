@@ -109,7 +109,7 @@ for i in range(num_trials):
                                  final_temp=final_temp)
 
     # Optimize the mutant and store the best mutant and its fitness in a pickle file
-    best_mut, fitness = sa_optimizer.optimize(wt_functional_threshold)
+    best_mut, fitness = sa_optimizer.optimize(non_gap_indices, wt_functional_threshold)
     with open(best_mutant_file, 'wb') as f:
         pickle.dump((best_mut, fitness), f)
 
