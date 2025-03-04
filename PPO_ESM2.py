@@ -1182,7 +1182,7 @@ class ProtDataModuleESM2(pl.LightningDataModule):
 
 class ProtRepDatasetESM2(torch.utils.data.Dataset):
     def __init__(self, wt_sequence):
-        self.wt_sequence = WT
+        self.wt_sequence = wt_sequence
 
     def __len__(self):
         return 1 # 1 sequence
