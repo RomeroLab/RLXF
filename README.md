@@ -61,7 +61,7 @@ Files generated:
   - metrics and hyperparameters for each reward model
   - single_mutant_probability_heatmaps: single mutant probabilities from pretrained or SFT pLM for wildtype sequenece or amino acid sequence with high confidence mutations
 
-## Step 4: Perform PPO
+## Step 4: PPO
 Align SFT-pLM with proximal policy optimization
 
 ```python3 running_PPO.py > running_PPO.out```
