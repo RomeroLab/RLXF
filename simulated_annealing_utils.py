@@ -162,17 +162,16 @@ class seq_function_handler:
         self.seq = seq
         self.models = models
 
-        # Set up Amino Acid Dictionary of Indices
-        AAs = 'ACDEFGHIKLMNPQRSTVWY-' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
-        aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
-        aa2ind.set_default_index(20) # set unknown charcterers to gap
+        AAs = 'ACDEFGHIKLMNPQRSTVWY-'  # Standard amino acids plus gap ('-')
+        aa2ind = {aa: i for i, aa in enumerate(AAs)}  # Create dictionary for mapping
+        unknown_index = len(AAs)  # Assign unknown characters an index beyond known AAs
         self.aa2ind = aa2ind
         
     def seq2fitness(self, seq):
         labels = []
 
-        # Convert the sequence to tensor representation for model prediction
-        sequence_tensor = torch.tensor([self.aa2ind[a] for a in seq], dtype=torch.long).unsqueeze(0)
+        # Convert the sequence to tensor representation
+        sequence_tensor = torch.tensor([self.aa2ind.get(a, unknown_index) for a in seq], dtype=torch.long).unsqueeze(0)
 
         # Score Sequence for all models
         with torch.no_grad():
