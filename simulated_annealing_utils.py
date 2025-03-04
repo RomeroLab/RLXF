@@ -42,7 +42,7 @@ class SA_optimizer:
         self.close_sequences = []
 
 
-    def optimize(self, non_gap_indices, wt_functional_threshold=None, start_mut=None):
+    def optimize(self, non_gap_indices, dir_path, wt_functional_threshold=None, start_mut=None):
 
         # If no starting mutation is provided, generate one randomly
         if start_mut is None:
