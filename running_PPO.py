@@ -208,7 +208,7 @@ else:
 trainer.fit(model, dm)
 
 # Plot metrics
-pt_metrics = pd.read_csv(f'{save_filepath}/version_{version}/metrics.csv')
+pt_metrics = pd.read_csv(f'{save_filepath}_{model_identifier}/version_{version}/metrics.csv')
 # Define the metrics you want to plot
 metrics_to_plot = [
     ['kl_divergence'],
@@ -251,8 +251,8 @@ for i, metric_group in enumerate(metrics_to_plot):
 # Adjust the layout and display the plot
 fig.tight_layout()
 # Save figure
-plt.savefig(f'{save_filepath}/version_{version}/metrics_vs_steps.svg')
-plt.savefig(f'{save_filepath}/version_{version}/metrics_vs_steps.png')
+plt.savefig(f'{save_filepath}_{model_identifier}/version_{version}/metrics_vs_steps.svg')
+plt.savefig(f'{save_filepath}_{model_identifier}/version_{version}/metrics_vs_steps.png')
 print('saved learning curves from aligned model')
 
 ############################################################################################################################################################
@@ -261,7 +261,7 @@ print('saved learning curves from aligned model')
 fixed_model = AutoModelForMaskedLM.from_pretrained(f"facebook/{model_identifier}")
 
 # Generate and evaluate 1000 designs with 5 mutants
-fixed_mutated_seqs, fixed_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, fixed_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
+fixed_mutated_seqs, fixed_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, fixed_model, model_identifier, tokenizer, f'{save_filepath}_{model_identifier}', ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
 print(f"Status: finished generating sequences with fixed {model_identifier}")
 
 # Save mutants from ESM2
@@ -279,7 +279,7 @@ state_dict = torch.load(f'{sft_model_path}')
 sft_model.load_state_dict(state_dict)
 
 # Generate and evaluate 1000 designs with 5 mutants from both models
-sft_mutated_seqs, sft_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, sft_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
+sft_mutated_seqs, sft_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, sft_model, model_identifier, tokenizer, f'{save_filepath}_{model_identifier}', ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
 print(f"Status: finished generating sequences with sft {model_identifier}")
 
 # Save mutants from ESM2
@@ -328,7 +328,7 @@ rl_model.load_state_dict(state_dict)
 
 # Generate and evaluate 1000 designs with 5 mutants from both models
 rl_model_identifier = f"SFT_{model_identifier}"
-rl_mutated_seqs, rl_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, rl_model, rl_model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
+rl_mutated_seqs, rl_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, rl_model, rl_model_identifier, tokenizer, f'{save_filepath}_{model_identifier}', ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
 print(f"Status: finished generating sequences with sft {model_identifier}")
 
 # Save mutants from ESM2
