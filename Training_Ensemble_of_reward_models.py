@@ -26,8 +26,8 @@ num_muts_of_val_test_splits = 5 # variants with this number of mutations will be
 percent_validation_split = 75 # defines percent of variants with num_muts_of_val_test_splits mutations to be in validation set
 learning_rate = 1e-6
 batch_size = 128
-epochs = 100 # 2000
-num_models = 2 # 100 # number of models in ensemble
+epochs = 2000
+num_models = 100 # number of models in ensemble
 patience = 400 # patience for EarlyStopping, I recommend training ensemble for awhile after loss plateaus
 WT = 'MAGLRHTFVVADATLPDCPLVYASEGFYAMTGYGPDEVLGHNARFLQGEGTDPKEVQKIRDAIKKGEACSVRLLNYRKDGTPFWNLLTVTPIKTPDGRVSKFVGVQVDVTSKTEGKALA' # parent sequence
 slen = len(WT) # length of parent sequence
@@ -46,61 +46,61 @@ dm = ProtDataModule(df, num_muts_threshold, num_muts_of_val_test_splits, percent
 
 # ############################################################## train reward models ##############################################################
 model_savepath = './reward_models'
-# os.makedirs(model_savepath, exist_ok=True)
-# for i in range(num_models):
-#     model = MLP(learning_rate, batch_size, epochs, slen) # Resubstantiate the model for each training iteration
-#     print(f"Model {i} is trained on: {model.device}")
-#     logger_name = f'reward_model'
-#     logger = CSVLogger('logs', name=logger_name)
-#     checkpoint_callback = ModelCheckpoint(dirpath=model_savepath,filename=f'reward_model_v{i}',monitor='val_loss',mode='min',save_top_k=1) # Define the model checkpoint callback with version number in the filename
-#     early_stopping = EarlyStopping(monitor='val_loss', patience=patience, mode='min') # Use early stopping
-#     trainer = pl.Trainer(logger=logger, max_epochs=epochs, callbacks=[early_stopping, checkpoint_callback], enable_progress_bar=False) # Trainer with early stopping and checkpointing
-#     trainer.fit(model, dm) # Train the model
-#     metrics_file_name = f'metrics.csv'
-#     pt_metrics = pd.read_csv(f'logs/reward_model/version_{i}/metrics.csv')
+os.makedirs(model_savepath, exist_ok=True)
+for i in range(num_models):
+    model = MLP(learning_rate, batch_size, epochs, slen) # Resubstantiate the model for each training iteration
+    print(f"Model {i} is trained on: {model.device}")
+    logger_name = f'reward_model'
+    logger = CSVLogger('logs', name=logger_name)
+    checkpoint_callback = ModelCheckpoint(dirpath=model_savepath,filename=f'reward_model_v{i}',monitor='val_loss',mode='min',save_top_k=1) # Define the model checkpoint callback with version number in the filename
+    early_stopping = EarlyStopping(monitor='val_loss', patience=patience, mode='min') # Use early stopping
+    trainer = pl.Trainer(logger=logger, max_epochs=epochs, callbacks=[early_stopping, checkpoint_callback], enable_progress_bar=False) # Trainer with early stopping and checkpointing
+    trainer.fit(model, dm) # Train the model
+    metrics_file_name = f'metrics.csv'
+    pt_metrics = pd.read_csv(f'logs/reward_model/version_{i}/metrics.csv')
 
-# ############################################################## plot loss curves ##############################################################
-# train_losses = []
-# val_losses = []
-# for i in range(num_models):
-#     try:
-#         pt_metrics = pd.read_csv(f'logs/reward_model/version_{i}/metrics.csv')
-#         train = pt_metrics[~pt_metrics.train_loss.isna()]
-#         val = pt_metrics[~pt_metrics.val_loss.isna()]
-#         max_epochs = max(len(train), len(val))  # Update the maximum number of epochs
-#         train_losses.append(train.train_loss.tolist())
-#         val_losses.append(val.val_loss.tolist())
-#     except FileNotFoundError:
-#         print(f"Metrics file for version {i} not found.")
-#         continue
+############################################################## plot loss curves ##############################################################
+train_losses = []
+val_losses = []
+for i in range(num_models):
+    try:
+        pt_metrics = pd.read_csv(f'logs/reward_model/version_{i}/metrics.csv')
+        train = pt_metrics[~pt_metrics.train_loss.isna()]
+        val = pt_metrics[~pt_metrics.val_loss.isna()]
+        max_epochs = max(len(train), len(val))  # Update the maximum number of epochs
+        train_losses.append(train.train_loss.tolist())
+        val_losses.append(val.val_loss.tolist())
+    except FileNotFoundError:
+        print(f"Metrics file for version {i} not found.")
+        continue
 
-# # Pad each loss array in train_losses and val_losses to max_length with np.nan
-# max_length = max(max(len(loss_array) for loss_array in train_losses), max(len(loss_array) for loss_array in val_losses))
-# train_losses_padded = [np.pad(loss_array, (0, max_length - len(loss_array)), constant_values=np.nan) for loss_array in train_losses]
-# val_losses_padded = [np.pad(loss_array, (0, max_length - len(loss_array)), constant_values=np.nan) for loss_array in val_losses]
+# Pad each loss array in train_losses and val_losses to max_length with np.nan
+max_length = max(max(len(loss_array) for loss_array in train_losses), max(len(loss_array) for loss_array in val_losses))
+train_losses_padded = [np.pad(loss_array, (0, max_length - len(loss_array)), constant_values=np.nan) for loss_array in train_losses]
+val_losses_padded = [np.pad(loss_array, (0, max_length - len(loss_array)), constant_values=np.nan) for loss_array in val_losses]
 
-# # Calculate the mean and standard deviation
-# train_mean = np.nanmean(train_losses_padded, axis=0)
-# val_mean = np.nanmean(val_losses_padded, axis=0)
-# train_std = np.nanstd(train_losses_padded, axis=0)
-# val_std = np.nanstd(val_losses_padded, axis=0)
-# epochs = np.arange(max_length)
+# Calculate the mean and standard deviation
+train_mean = np.nanmean(train_losses_padded, axis=0)
+val_mean = np.nanmean(val_losses_padded, axis=0)
+train_std = np.nanstd(train_losses_padded, axis=0)
+val_std = np.nanstd(val_losses_padded, axis=0)
+epochs = np.arange(max_length)
 
-# # Plot figure
-# plt.figure(figsize=(8, 6))
-# plt.plot(epochs, train_mean, label='Training Loss')
-# plt.fill_between(epochs, train_mean - train_std, train_mean + train_std, alpha=0.2, label='±1 Standard Deviation')
-# plt.plot(epochs, val_mean, label='Validation Loss')
-# plt.fill_between(epochs, val_mean - val_std, val_mean + val_std, alpha=0.2, label='±1 Standard Deviation')
-# plt.ylabel('Loss')
-# plt.xlabel('Epoch')
-# ax = plt.gca()  # Get the current axis
-# ax.spines['top'].set_visible(False)
-# ax.spines['right'].set_visible(False)
-# plt.legend()
-# file_path = os.path.join(model_savepath, 'Loss_Curve.png')
-# plt.savefig(file_path, bbox_inches='tight')
-# # plt.show()
+# Plot figure
+plt.figure(figsize=(8, 6))
+plt.plot(epochs, train_mean, label='Training Loss')
+plt.fill_between(epochs, train_mean - train_std, train_mean + train_std, alpha=0.2, label='±1 Standard Deviation')
+plt.plot(epochs, val_mean, label='Validation Loss')
+plt.fill_between(epochs, val_mean - val_std, val_mean + val_std, alpha=0.2, label='±1 Standard Deviation')
+plt.ylabel('Loss')
+plt.xlabel('Epoch')
+ax = plt.gca()  # Get the current axis
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+plt.legend()
+file_path = os.path.join(model_savepath, 'Loss_Curve.png')
+plt.savefig(file_path, bbox_inches='tight')
+# plt.show()
 
 ############################################################## evaluate reward models on test set ##############################################################
 all_Y_values = [[] for _ in range(len(df.iloc[dm.test_idx]))]  # List of lists to store predictions for each sequence
