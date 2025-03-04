@@ -285,7 +285,7 @@ def generate_and_evaluate_mutants_p_sampling(WT, reward_models, model, model_ide
         with torch.no_grad():
             for j, seq in enumerate(mutated_seqs):
                 # sequence = torch.tensor(aa2ind(list(seq))).to(device)
-                score = reward_model.predict(sequence)[0][0]
+                score = reward_model.predict(seq)[0][0]
                 scores_tensor[i, j] = score
 
     # Convert PyTorch tensors to NumPy arrays
