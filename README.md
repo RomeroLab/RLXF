@@ -35,14 +35,17 @@ We generate a small, high quality synthetic sequence dataset via simulated annea
 ```python3 simulated_annealing.py > simulated_annealing.out```
 
 Files generated:
-- **unique_optimized_designs_from_simulated_annealing**: contains unique final optimized synthetic sequence for trials for SFT
-- **all_optimized_designs_from_simulated_annealing**: contains final optimized synthetic sequence from each trial
-- **parameters.txt**: parameters used for simulated annealing
-- **best_{num_mut}mut_v{i}.pickle**: contains best mutant found for trial
-- **fitness_trajectory_{num_mut}mut_v{i}.csv**: contains scores for each step
-- **traj_{num_mut}mut_v{i}.png**: plots scores vs. step for trial
-- Optional: **close_sequences_{num_mut}mut_v{i}.pickle.pkl**: Use wt_functional_threshold to save sequences predicted to be have enhanced function relative to wildtype (parent sequence)
-- **traj_{num_mut}mut_v{i}.png**: plots scores vs. step for trial
+- **unique_optimized_designs_from_simulated_annealing.pkl**: contains unique final optimized synthetic sequence for trials for SFT
+- **all_optimized_designs_from_simulated_annealing.pkl**: contains final optimized synthetic sequence from each trial
+- **simulated_annealing_results**: folder containing
+  - **SA_mutation_distribution.png/svg**: contains heatmap of mutations in unique_optimized_designs_from_simulated_annealing.pkl sequences
+  - **{num_muts}mut_{nsteps}steps**: folder containg
+    - **parameters.txt**: parameters used for simulated annealing
+    - **best_{num_mut}mut_v{i}.pickle**: contains best mutant found for trial
+    - **fitness_trajectory_{num_mut}mut_v{i}.csv**: contains scores for each step
+    - **traj_{num_mut}mut_v{i}.png**: plots scores vs. step for trial
+    - Optional: **close_sequences_{num_mut}mut_v{i}.pickle.pkl**: Use wt_functional_threshold to save sequences predicted to be have enhanced function relative to wildtype (parent sequence)
+    - **traj_{num_mut}mut_v{i}.png**: plots scores vs. step for trial
   
 ## Step 3: SFT
 Supervise finetune pLM
@@ -68,7 +71,8 @@ Files generated:
 ## Training and reproducibility notes
 - We trained the ensemble of reward models on one NVIDIA RTX A4500 GPU and performed simulated annealing on AMD EPYC 7302 16-Core Processor CPUs.
 - We performed SFT and PPO with ESM-2 models on 1 NVIDIA L40S GPU.
-- Packages:
+- Packages for our conda enviroment:
+  - *package*                 *version*
   - pytorch                   2.3.0
   - pytorch-cuda              12.1
   - pytorch-lightning         2.0.3
