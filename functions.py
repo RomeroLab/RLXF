@@ -282,4 +282,29 @@ def generate_and_evaluate_mutants_p_sampling(WT, reward_models, model, model_ide
 
     return mutated_seqs, scores_np
 
+# Generate DataFrames for RL, SFT, and Fixed sequences
+def generate_df(sequences, scores):
+    mutations_list = []
+    num_mutations_list = []
+    
+    for seq in sequences:
+        mutation_str, num_mutations = identify_mutations_and_count(WT, seq)
+        mutations_list.append(mutation_str)
+        num_mutations_list.append(num_mutations)
+    
+    return pd.DataFrame({
+        'Sequence': sequences,
+        'Score': scores,
+        'Mutations': mutations_list,
+        'Number of Mutations': num_mutations_list})
+
+# Function to identify mutations and count them
+def identify_mutations_and_count(WT, seq):
+    mutations = []
+    for i, (wt_aa, seq_aa) in enumerate(zip(WT, seq), start=1):
+        if wt_aa != seq_aa:
+            mutations.append(f"{wt_aa}{i}{seq_aa}")
+    mutation_str = ', '.join(mutations)
+    num_mutations = len(mutations)
+    return mutation_str, num_mutations
 
