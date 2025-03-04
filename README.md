@@ -21,7 +21,10 @@ We train an ensemble of multi-layer perceptrons to predict the log fluoresence o
 
 Files generated:
 - **SeqFxnDataset_splits.pkl**: datasplits for training, validation, and test sets
-- **Loss_Curve.png**: plots average mse for ensemble vs. epoch
+- **logs/reward_model**: folder
+  - contains metrics and hyperparameters for each reward model
+- **reward_models**: folder
+  - contains reward model as .ckpt files and average mse loss vs. epoch for ensemble of reward models
 - **Test_Results.png**: plot of actual vs. predicted sequence function
 - **Test_Results.csv**: contains 'MSE', 'Pearson R', and 'Spearman's Rho' metrics for test set
 - also creates typical metrics files for each reward model in the log folder
@@ -63,7 +66,9 @@ Generate designs to characterize
 Files generated:
 
 ## Training and reproducibility notes
-- We performed RLXF on 1 NVIDIA L40S GPU
+- We trained the ensemble of reward models on one NVIDIA RTX A4500 GPU.
+- We performed simulated annealing on AMD EPYC 7302 16-Core Processor CPUs.
+- We performed SFT and PPO with ESM-2 models on 1 NVIDIA L40S GPU.
 - Packages:
   - pytorch                   2.3.0
   - pytorch-cuda              12.1
