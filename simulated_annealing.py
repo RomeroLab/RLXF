@@ -19,14 +19,14 @@ import csv
 
 # import helper scripts
 from MLP import (SeqFcnDataset, ProtDataModule, MLP)
-from SA_utils import (SA_optimizer, get_non_gap_indices, get_last_fitness_value, get_mutations, apply_mutations, plot_heatmap_for_configuration)
+from simulated_annealing_utils import (SA_optimizer, get_non_gap_indices, get_last_fitness_value, get_mutations, apply_mutations, plot_heatmap_for_configuration)
 
 # Parameters to update
 AAs = 'ACDEFGHIKLMNPQRSTVWY-' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
 WT = 'MAGLRHTFVVADATLPDCPLVYASEGFYAMTGYGPDEVLGHNARFLQGEGTDPKEVQKIRDAIKKGEACSVRLLNYRKDGTPFWNLLTVTPIKTPDGRVSKFVGVQVDVTSKTEGKALA' # parent sequence
 wt_functional_threshold = None # find the predicted function of parent sequence with ensemble of reward models if you want to find more sequences
-num_models = 100 # number of models in ensemble
-num_trials = 100 # number of simulated annealing trials
+num_models = 2 # 100 # number of models in ensemble
+num_trials = 2 # 100 # number of simulated annealing trials
 num_mut = 5 # number of mutations ideally for the number of mutations in the designs you want to characterize after functional alignment
 nsteps = 50000 # number of steps during simulated annealing
 mut_rate = 2 # number of mutations per step
