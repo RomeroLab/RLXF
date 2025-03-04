@@ -85,7 +85,7 @@ dkl_scale = 1e-7 # weight term for Dkl after 1st epoch
 
 # hyparameters regarding model saving
 filepath = 'PPO'
-save_filepath = f'./logs/{filepath}'
+save_filepath = f'./logs/{filepath}_{model_identifier}'
 
 # parameters for generating designs after alignment
 num_designs = 2 # 100
@@ -208,7 +208,7 @@ else:
 trainer.fit(model, dm)
 
 # Plot metrics
-pt_metrics = pd.read_csv(f'{save_filepath}_{model_identifier}/version_{version}/metrics.csv')
+pt_metrics = pd.read_csv(f'{save_filepath}/version_{version}/metrics.csv')
 # Define the metrics you want to plot
 metrics_to_plot = [
     ['kl_divergence'],
@@ -251,8 +251,8 @@ for i, metric_group in enumerate(metrics_to_plot):
 # Adjust the layout and display the plot
 fig.tight_layout()
 # Save figure
-plt.savefig(f'{save_filepath}_{model_identifier}/version_{version}/metrics_vs_steps.svg')
-plt.savefig(f'{save_filepath}_{model_identifier}/version_{version}/metrics_vs_steps.png')
+plt.savefig(f'{save_filepath}/version_{version}/metrics_vs_steps.svg')
+plt.savefig(f'{save_filepath}/version_{version}/metrics_vs_steps.png')
 print('saved learning curves from aligned model')
 
 ############################################################################################################################################################
@@ -261,11 +261,11 @@ print('saved learning curves from aligned model')
 fixed_model = AutoModelForMaskedLM.from_pretrained(f"facebook/{model_identifier}")
 
 # Generate and evaluate 1000 designs with 5 mutants
-fixed_mutated_seqs, fixed_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, fixed_model, model_identifier, tokenizer, f'{save_filepath}_{model_identifier}', ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
+fixed_mutated_seqs, fixed_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, fixed_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
 print(f"Status: finished generating sequences with fixed {model_identifier}")
 
 # Save mutants from ESM2
-base_path = f'./logs/{filepath}/version_{version}/'
+base_path = f'./logs/{save_filepath}/version_{version}/'
 np.save(base_path + f'fixed_{model_identifier}_scores.npy', fixed_scores_np)
 with open(base_path + f'fixed_{model_identifier}_mutated_seqs.txt', 'w') as file:
     for seq in fixed_mutated_seqs:
@@ -279,11 +279,11 @@ state_dict = torch.load(f'{sft_model_path}')
 sft_model.load_state_dict(state_dict)
 
 # Generate and evaluate 1000 designs with 5 mutants from both models
-sft_mutated_seqs, sft_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, sft_model, model_identifier, tokenizer, f'{save_filepath}_{model_identifier}', ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
+sft_mutated_seqs, sft_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, sft_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
 print(f"Status: finished generating sequences with sft {model_identifier}")
 
 # Save mutants from ESM2
-base_path = f'./logs/{filepath}/version_{version}/'
+base_path = f'./logs/{save_filepath}/version_{version}/'
 np.save(base_path + f'sft_{model_identifier}_scores.npy', sft_scores_np)
 with open(base_path + f'sft_{model_identifier}_mutated_seqs.txt', 'w') as file:
     for seq in sft_mutated_seqs:
@@ -292,14 +292,14 @@ with open(base_path + f'sft_{model_identifier}_mutated_seqs.txt', 'w') as file:
 ############################################################################################################################################################
 
 # Load mutants
-fixed_scores_np = np.load(f'./logs/{filepath}/version_{version}/fixed_{model_identifier}_scores.npy')
+fixed_scores_np = np.load(f'./logs/{save_filepath}/version_{version}/fixed_{model_identifier}_scores.npy')
 fixed_mutated_seqs = []
-with open(f'./logs/{filepath}/version_{version}/fixed_{model_identifier}_mutated_seqs.txt', 'r') as file:
+with open(f'./logs/{save_filepath}/version_{version}/fixed_{model_identifier}_mutated_seqs.txt', 'r') as file:
     fixed_mutated_seqs = file.read().splitlines()
 
-sft_scores_np = np.load(f'./logs/{filepath}/version_{version}/sft_{model_identifier}_scores.npy')
+sft_scores_np = np.load(f'./logs/{save_filepath}/version_{version}/sft_{model_identifier}_scores.npy')
 sft_mutated_seqs = []
-with open(f'./logs/{filepath}/version_{version}/sft_{model_identifier}_mutated_seqs.txt', 'r') as file:
+with open(f'./logs/{save_filepath}/version_{version}/sft_{model_identifier}_mutated_seqs.txt', 'r') as file:
     sft_mutated_seqs = file.read().splitlines()
 
 # Generate DataFrames
@@ -307,48 +307,48 @@ df_sft = generate_df(sft_mutated_seqs, np.median(sft_scores_np, axis=0), WT)
 df_fixed = generate_df(fixed_mutated_seqs, np.median(fixed_scores_np, axis=0), WT)
 
 # Save to CSV
-df_sft.to_csv(f'./logs/{filepath}/version_{version}/{model_identifier}_sft_mutated_designs_scores.csv', index=False)
-df_fixed.to_csv(f'./logs/{filepath}/version_{version}/{model_identifier}_fixed_mutated_designs_scores.csv', index=False)
+df_sft.to_csv(f'./logs/{save_filepath}/version_{version}/{model_identifier}_sft_mutated_designs_scores.csv', index=False)
+df_fixed.to_csv(f'./logs/{save_filepath}/version_{version}/{model_identifier}_fixed_mutated_designs_scores.csv', index=False)
 
 # Load mutants
-fixed_scores_np = np.load(f'./logs/{filepath}/version_{version}/fixed_{model_identifier}_scores.npy')
+fixed_scores_np = np.load(f'./logs/{save_filepath}/version_{version}/fixed_{model_identifier}_scores.npy')
 fixed_mutated_seqs = []
-with open(f'./logs/{filepath}/version_{version}/fixed_{model_identifier}_mutated_seqs.txt', 'r') as file:
+with open(f'./logs/{save_filepath}/version_{version}/fixed_{model_identifier}_mutated_seqs.txt', 'r') as file:
     fixed_mutated_seqs = file.read().splitlines()
 
-sft_scores_np = np.load(f'./logs/{filepath}/version_{version}/sft_{model_identifier}_scores.npy')
+sft_scores_np = np.load(f'./logs/{save_filepath}/version_{version}/sft_{model_identifier}_scores.npy')
 sft_mutated_seqs = []
-with open(f'./logs/{filepath}/version_{version}/sft_{model_identifier}_mutated_seqs.txt', 'r') as file:
+with open(f'./logs/{save_filepath}/version_{version}/sft_{model_identifier}_mutated_seqs.txt', 'r') as file:
     sft_mutated_seqs = file.read().splitlines()
 
 # Load rl models
 rl_model = AutoModelForMaskedLM.from_pretrained(f"facebook/{model_identifier}")
-state_dict = torch.load(f'./logs/{filepath}/version_{version}/ema_aligned_{model_identifier}_v{version}_ep{ep}.pt')
+state_dict = torch.load(f'./logs/{save_filepath}/version_{version}/ema_aligned_{model_identifier}_v{version}_ep{ep}.pt')
 rl_model.load_state_dict(state_dict)
 
 # Generate and evaluate 1000 designs with 5 mutants from both models
 rl_model_identifier = f"SFT_{model_identifier}"
-rl_mutated_seqs, rl_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, rl_model, rl_model_identifier, tokenizer, f'{save_filepath}_{model_identifier}', ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
+rl_mutated_seqs, rl_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, rl_model, rl_model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
 print(f"Status: finished generating sequences with sft {model_identifier}")
 
 # Save mutants from ESM2
-base_path = f'./logs/{filepath}/version_{version}/'
+base_path = f'./logs/{save_filepath}/version_{version}/'
 np.save(base_path + f'ema_aligned_{model_identifier}_scores.npy', rl_scores_np)
 with open(base_path + f'ema_aligned_{model_identifier}_mutated_seqs.txt', 'w') as file:
     for seq in rl_mutated_seqs:
         file.write(seq + '\n')
 
 # Load mutants
-rl_scores_np = np.load(f'./logs/{filepath}/version_{version}/ema_aligned_{model_identifier}_scores.npy')
+rl_scores_np = np.load(f'./logs/{save_filepath}/version_{version}/ema_aligned_{model_identifier}_scores.npy')
 rl_mutated_seqs = []
-with open(f'./logs/{filepath}/version_{version}/ema_aligned_{model_identifier}_mutated_seqs.txt', 'r') as file:
+with open(f'./logs/{save_filepath}/version_{version}/ema_aligned_{model_identifier}_mutated_seqs.txt', 'r') as file:
     rl_mutated_seqs = file.read().splitlines()
 
 # Generate DataFrames
 df_rl = generate_df(rl_mutated_seqs, np.median(rl_scores_np, axis=0), WT)
 
 # Save to CSV
-df_rl.to_csv(f'./logs/{filepath}/version_{version}/ema_aligned_{model_identifier}_mutated_designs_scores_ep{ep}.csv', index=False)
+df_rl.to_csv(f'./logs/{save_filepath}/version_{version}/ema_aligned_{model_identifier}_mutated_designs_scores_ep{ep}.csv', index=False)
 
 # Plot histogram
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
