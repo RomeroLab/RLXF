@@ -151,7 +151,7 @@ with torch.no_grad():
     fixed_mutated_seqs, fixed_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, fixed_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
     print(f"Status: finished generating sequences with fixed {model_identifier}")
 
-    Save mutants from ESM2
+    # Save mutants from ESM2
     base_path = f'./logs/{logger_name}/version_{version}/'
     np.save(base_path + f'fixed_{model_identifier}_scores.npy', fixed_scores_np)
     with open(base_path + f'fixed_{model_identifier}_mutated_seqs.txt', 'w') as file:
