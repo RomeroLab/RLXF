@@ -34,6 +34,8 @@ start_temp = -1.6 # initial temperature, this may need to be optimized for your 
 final_temp = -3.1 # final temperature, this may need to be optimized for your functional score
 seed = 1
 
+print('made it here')
+
 # use seed for reproducibility
 random.seed(seed)
 np.random.seed(seed)
