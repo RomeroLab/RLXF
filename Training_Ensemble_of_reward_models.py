@@ -51,11 +51,9 @@ for i in range(num_models):
     model = MLP(learning_rate, batch_size, epochs, slen) # Resubstantiate the model for each training iteration
     logger_name = f'reward_model'
     logger = CSVLogger('logs', name=logger_name)
-    # device = 'cuda' if torch.cuda.is_available() else 'cpu'
     checkpoint_callback = ModelCheckpoint(dirpath=model_savepath,filename=f'reward_model_v{i}',monitor='val_loss',mode='min',save_top_k=1) # Define the model checkpoint callback with version number in the filename
     early_stopping = EarlyStopping(monitor='val_loss', patience=patience, mode='min') # Use early stopping
     trainer = pl.Trainer(logger=logger, max_epochs=epochs, callbacks=[early_stopping, checkpoint_callback], enable_progress_bar=False) # Trainer with early stopping and checkpointing
-    # accelerator=device, devices=1
     trainer.fit(model, dm) # Train the model
     metrics_file_name = f'metrics.csv'
     pt_metrics = pd.read_csv(f'logs/reward_model/version_{i}/metrics.csv')
