@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
 # import helper scripts
-from functions import (generate_df, generate_and_evaluate_mutants_p_sampling)
+from functions import (mask_mutations, generate_df, generate_and_evaluate_mutants_p_sampling)
 from SFT_ESM2 import (SFT_ESM2, SFTDataModule)
 
 # Parameters to update
@@ -86,6 +86,12 @@ ESM2 = ESM2.to(device)
 
 # Load preference data
 df = pd.read_pickle("./unique_optimized_designs_from_simulated_annealing.pkl") # load preprocessed CreiLOV data
+print(df.head(1))
+
+# Apply mutation masking
+df['Masked_Sequence'] = df['Sequence'].apply(lambda seq: mask_mutations(seq, WT))
+print(df.head(1))
+
 
 ############################################################################################################################################################
 

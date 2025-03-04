@@ -48,6 +48,14 @@ def mask_sequence(sequence, mask_pos):
     masked_seq_str = ''.join(masked_sequence)
     return masked_seq_str
 
+def mask_mutations(sequence, wt_sequence):
+    """Mask all positions in the sequence that differ from the wild-type sequence."""
+    masked_sequence = list(sequence)
+    for i, (wt_res, res) in enumerate(zip(wt_sequence, sequence)):
+        if wt_res != res:
+            masked_sequence[i] = '<mask>'
+    return ''.join(masked_sequence)
+
 def get_logits_for_all_positions(model, WT, tokenizer, model_identifier=None):
     """Generate logits for all positions in the WT sequence by masking one position at a time."""
     sequence_length = len(WT)
