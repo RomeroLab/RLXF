@@ -10,6 +10,8 @@ import torch.optim as optim
 import torch.utils.data as data_utils
 import pytorch_lightning as pl
 import matplotlib.pyplot as plt
+from collections import OrderedDict
+from torchtext import vocab
 import os
 import random
 import pickle
@@ -160,15 +162,16 @@ class seq_function_handler:
         self.seq = seq
         self.models = models
 
-        AAs = 'ACDEFGHIKLMNPQRSTVWY-'  # Standard amino acids plus gap ('-')
-        aa2ind = {aa: i for i, aa in enumerate(AAs)}  # Create dictionary for mapping
+        AAs = 'ACDEFGHIKLMNPQRSTVWY-' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
+        aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
+        aa2ind.set_default_index(20) # set unknown charcterers to gap
         self.aa2ind = aa2ind
         
     def seq2fitness(self, seq):
         labels = []
 
         # Convert the sequence to tensor representation
-        sequence_tensor = torch.tensor([self.aa2ind.get(a) for a in seq], dtype=torch.long).unsqueeze(0)
+        sequence_tensor = torch.tensor([self.aa2ind[a] for a in seq], dtype=torch.long)
 
         # Score Sequence for all models
         with torch.no_grad():
