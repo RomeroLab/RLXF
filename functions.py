@@ -111,8 +111,8 @@ def generate_heatmap(WT, probabilities, model_identifier, sequence, filepath, ep
                        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='red', markersize=10, label='Mutation')]
     plt.legend(handles=legend_elements, loc='upper right')
     plt.tight_layout()
-    plt.savefig(f'{filepath}/version_{version}/single_mutant_probability_heatmap_for_{muts_rel_WT}_from_{model_identifier}_ep{ep}.png')
-    plt.savefig(f'{filepath}/version_{version}/single_mutant_probability_heatmap_for_{muts_rel_WT}_from_{model_identifier}_ep{ep}.svg')
+    plt.savefig(f'{filepath}/single_mutant_probability_heatmap_for_{muts_rel_WT}_from_{model_identifier}_ep{ep}.png')
+    plt.savefig(f'{filepath}/single_mutant_probability_heatmap_for_{muts_rel_WT}_from_{model_identifier}_ep{ep}.svg')
     plt.close()
 
 def get_mutations(seq, wt):

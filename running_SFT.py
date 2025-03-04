@@ -86,11 +86,11 @@ ESM2 = ESM2.to(device)
 
 # Load preference data
 df = pd.read_pickle("./unique_optimized_designs_from_simulated_annealing.pkl") # load preprocessed CreiLOV data
-print(df.head(1))
+# print(df['Mutations'].head(1))
 
 # Apply mutation masking
 df['Masked_Sequence'] = df['Sequence'].apply(lambda seq: mask_mutations(seq, WT))
-print(df.head(1))
+# print(df.head(1))
 
 
 ############################################################################################################################################################
