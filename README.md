@@ -42,9 +42,9 @@ Files generated:
   - **{num_muts}mut_{nsteps}steps**: folder containg
     - **parameters.txt**: parameters used for simulated annealing
     - **best_{num_mut}mut_v{i}.pickle**: contains best mutant found for trial
-    - **fitness_trajectory_{num_mut}mut_v{i}.csv**: contains scores for each step
+    - **fitness_trajectory_{num_mut}mut_v{version}.csv**: contains scores for each step
     - **traj_{num_mut}mut_v{i}.png**: plots scores vs. step for trial
-    - Optional: **close_sequences_{num_mut}mut_v{i}.pickle.pkl**: Use wt_functional_threshold to save sequences predicted to be have enhanced function relative to wildtype (parent sequence)
+    - Optional: **close_sequences_{num_mut}mut_v{version}.pickle**: Use wt_functional_threshold to save sequences predicted to be have enhanced function relative to wildtype (parent sequence)
     - **traj_{num_mut}mut_v{i}.png**: plots scores vs. step for trial
   
 ## Step 3: SFT
