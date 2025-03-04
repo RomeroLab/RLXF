@@ -26,8 +26,8 @@ num_muts_of_val_test_splits = 5 # variants with this number of mutations will be
 percent_validation_split = 75 # defines percent of variants with num_muts_of_val_test_splits mutations to be in validation set
 learning_rate = 1e-6
 batch_size = 128
-epochs = 2000
-num_models = 100 # number of models in ensemble
+epochs = 100 # 2000
+num_models = 2 # 100 # number of models in ensemble
 patience = 400 # patience for EarlyStopping, I recommend training ensemble for awhile after loss plateaus
 WT = 'MAGLRHTFVVADATLPDCPLVYASEGFYAMTGYGPDEVLGHNARFLQGEGTDPKEVQKIRDAIKKGEACSVRLLNYRKDGTPFWNLLTVTPIKTPDGRVSKFVGVQVDVTSKTEGKALA' # parent sequence
 slen = len(WT) # length of parent sequence
@@ -49,6 +49,7 @@ model_savepath = './reward_models'
 os.makedirs(model_savepath, exist_ok=True)
 for i in range(num_models):
     model = MLP(learning_rate, batch_size, epochs, slen) # Resubstantiate the model for each training iteration
+    print(f"Model {i} is trained on: {model.device}")
     logger_name = f'reward_model'
     logger = CSVLogger('logs', name=logger_name)
     checkpoint_callback = ModelCheckpoint(dirpath=model_savepath,filename=f'reward_model_v{i}',monitor='val_loss',mode='min',save_top_k=1) # Define the model checkpoint callback with version number in the filename
