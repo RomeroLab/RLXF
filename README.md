@@ -21,13 +21,13 @@ We train an ensemble of multi-layer perceptrons to predict the log fluoresence o
 
 Files generated:
 - **SeqFxnDataset_splits.pkl**: datasplits for training, validation, and test sets
-- **logs/reward_model**: folder
-  - contains metrics and hyperparameters for each reward model
-- **reward_models**: folder
-  - contains reward model as .ckpt files and average mse loss vs. epoch for ensemble of reward models
-- **Test_Results.png**: plot of actual vs. predicted sequence function
-- **Test_Results.csv**: contains 'MSE', 'Pearson R', and 'Spearman's Rho' metrics for test set
-- also creates typical metrics files for each reward model in the log folder
+- **logs/reward_model**: folder containing
+  - metrics and hyperparameters for each reward model
+- **reward_models**: folder containing
+  - reward models as .ckpt files
+  - **Loss_Curve.png**: average mse loss vs. epoch for ensemble of reward models
+  - **Test_Results.png**: plot of actual vs. predicted sequence function
+  - **Test_Results.csv**: contains 'MSE', 'Pearson R', and 'Spearman's Rho' metrics for test set
 
 ## Step 2: Generate synthetic sequence dataset for SFT via simulated annealing trials
 We generate a small, high quality synthetic sequence dataset via simulated annealing trials
@@ -66,8 +66,7 @@ Generate designs to characterize
 Files generated:
 
 ## Training and reproducibility notes
-- We trained the ensemble of reward models on one NVIDIA RTX A4500 GPU.
-- We performed simulated annealing on AMD EPYC 7302 16-Core Processor CPUs.
+- We trained the ensemble of reward models on one NVIDIA RTX A4500 GPU and performed simulated annealing on AMD EPYC 7302 16-Core Processor CPUs.
 - We performed SFT and PPO with ESM-2 models on 1 NVIDIA L40S GPU.
 - Packages:
   - pytorch                   2.3.0
@@ -75,11 +74,8 @@ Files generated:
   - pytorch-lightning         2.0.3
   - pytorch-mutex             1.0
   - torch-ema                 0.3
-  - torchaudio                2.3.0
   - torchmetrics              1.1.2
   - torchtext                 0.18.0
-  - torchtriton               2.3.0
-  - torchvision               0.18.0
   - numpy                     1.26.3
   - pandas                    1.5.3
   - transformers              4.40.1
