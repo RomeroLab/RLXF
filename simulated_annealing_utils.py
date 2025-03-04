@@ -165,11 +165,6 @@ class seq_function_handler:
     def __init__(self, seq, models):
         self.seq = seq
         self.models = models
-
-        AAs = 'ACDEFGHIKLMNPQRSTVWY-' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
-        aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
-        aa2ind.set_default_index(20) # set unknown charcterers to gap
-        self.aa2ind = aa2ind
         
     def seq2fitness(self, seq):
         labels = []
