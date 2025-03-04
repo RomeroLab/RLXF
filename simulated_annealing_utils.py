@@ -10,7 +10,7 @@ import torch.optim as optim
 import torch.utils.data as data_utils
 import pytorch_lightning as pl
 from collections import OrderedDict
-from torchtext.vocab import Vocab
+from torchtext import vocab
 import matplotlib.pyplot as plt
 import os
 import random
@@ -18,8 +18,9 @@ import pickle
 import csv
 
 # Set up Amino Acid Dictionary of Indices
-AAs = 'ACDEFGHIKLMNPQRSTVWY-' 
-aa2ind = Vocab(OrderedDict([(a, 1) for a in AAs]))
+AAs = 'ACDEFGHIKLMNPQRSTVWY-' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
+aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
+aa2ind.set_default_index(20) # set unknown charcterers to gap
 
 # Simulated Annealing Class
 class SA_optimizer:
@@ -166,8 +167,10 @@ class seq_function_handler:
         self.seq = seq
         self.models = models
 
-        AAs = 'ACDEFGHIKLMNPQRSTVWY-'
-        aa2ind = Vocab(OrderedDict([(a, 1) for a in AAs]))  # Explicitly set specials=[]
+        # Set up Amino Acid Dictionary of Indices
+        AAs = 'ACDEFGHIKLMNPQRSTVWY-' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
+        aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
+        aa2ind.set_default_index(20) # set unknown charcterers to gap
         self.aa2ind = aa2ind
         
     def seq2fitness(self, seq):

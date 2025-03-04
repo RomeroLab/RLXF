@@ -10,7 +10,7 @@ import torch.optim as optim
 import torch.utils.data as data_utils
 import pytorch_lightning as pl
 from collections import OrderedDict
-from torchtext.vocab import Vocab
+from torchtext import vocab
 import matplotlib.pyplot as plt
 import os
 import random
@@ -19,20 +19,7 @@ import csv
 
 # import helper scripts
 from MLP import (SeqFcnDataset, ProtDataModule, MLP)
-# from simulated_annealing_utils import (seq_function_handler, SA_optimizer, get_non_gap_indices, get_last_fitness_value, get_mutations, apply_mutations, plot_heatmap_for_configuration)
-
-from simulated_annealing_utils import (seq_function_handler)
-print('made it here 1')
-from simulated_annealing_utils import (seq_function_handler, SA_optimizer)
-print('made it here 2')
-from simulated_annealing_utils import (seq_function_handler, SA_optimizer, get_non_gap_indices)
-print('made it here 3')
-from simulated_annealing_utils import (seq_function_handler, SA_optimizer, get_non_gap_indices, get_last_fitness_value)
-print('made it here 4')
-from simulated_annealing_utils import (seq_function_handler, SA_optimizer, get_non_gap_indices, get_last_fitness_value, get_mutations, apply_mutations)
-print('made it here 5')
 from simulated_annealing_utils import (seq_function_handler, SA_optimizer, get_non_gap_indices, get_last_fitness_value, get_mutations, apply_mutations, plot_heatmap_for_configuration)
-print('made it here 6')
 
 # Parameters to update
 AAs = 'ACDEFGHIKLMNPQRSTVWY-' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
