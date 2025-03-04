@@ -173,7 +173,8 @@ with torch.no_grad():
     sft_model.load_state_dict(state_dict)
 
     # Generate and evaluate 1000 designs with 5 mutants from both models
-    sft_mutated_seqs, sft_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, sft_model, model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
+    sft_model_identifier = f"SFT_{model_identifier}"
+    sft_mutated_seqs, sft_scores_np = generate_and_evaluate_mutants_p_sampling(WT, reward_models, sft_model, sft_model_identifier, tokenizer, save_filepath, ep, version, num_designs, num_muts, cum_prob_threshold, high_conf_threshold, generation_seed)
     print(f"Status: finished generating sequences with sft {model_identifier}")
 
     # Save mutants from ESM2
