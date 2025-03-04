@@ -17,11 +17,6 @@ import random
 import pickle
 import csv
 
-# Set up Amino Acid Dictionary of Indices
-AAs = 'ACDEFGHIKLMNPQRSTVWY-' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
-aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
-aa2ind.set_default_index(20) # set unknown charcterers to gap
-
 # Simulated Annealing Class
 class SA_optimizer:
     def __init__(self, seq_fitness, WT, AA_options, num_mut, mut_rate, nsteps, cool_sched, non_gap_indices, start_temp, final_temp):
@@ -177,7 +172,7 @@ class seq_function_handler:
         labels = []
 
         # Convert the sequence to tensor representation for model prediction
-        sequence_tensor = torch.tensor(self.aa2ind(list(seq)))
+        sequence_tensor = torch.tensor([self.aa2ind[a] for a in seq], dtype=torch.long, device=device).unsqueeze(0)
 
         # Score Sequence for all models
         with torch.no_grad():

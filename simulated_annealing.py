@@ -22,7 +22,7 @@ from MLP import (SeqFcnDataset, ProtDataModule, MLP)
 from simulated_annealing_utils import (seq_function_handler, SA_optimizer, get_non_gap_indices, get_last_fitness_value, get_mutations, apply_mutations, plot_heatmap_for_configuration)
 
 # Parameters to update
-AAs = 'ACDEFGHIKLMNPQRSTVWY-' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
+AAs = 'ACDEFGHIKLMNPQRSTVWY-'
 WT = 'MAGLRHTFVVADATLPDCPLVYASEGFYAMTGYGPDEVLGHNARFLQGEGTDPKEVQKIRDAIKKGEACSVRLLNYRKDGTPFWNLLTVTPIKTPDGRVSKFVGVQVDVTSKTEGKALA' # parent sequence
 wt_functional_threshold = None # find the predicted function of parent sequence with ensemble of reward models if you want to find more sequences
 num_models = 2 # 100 # number of models in ensemble
