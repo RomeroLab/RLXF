@@ -120,14 +120,14 @@ else:
     print(f'Aligning {model_identifier} model from huggingface')
 
 # load ensemble of reward models
-models = []
-for i in range(num_models):
+reward_models = []
+for i in range(num_reward_models):
     model_name = f"reward_model_v{i}.ckpt"
     checkpoint_path = f"./reward_models/{model_name}"
     reward_model = MLP.load_from_checkpoint(checkpoint_path)
     for param in reward_model.parameters():
         param.requires_grad = False
-    models.append(reward_model)
+    reward_models.append(reward_model)
 
 # Determine if training on a GPU or CPU for reproducibility
 if torch.cuda.is_available():
