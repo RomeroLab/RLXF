@@ -10,7 +10,7 @@ import torch.optim as optim
 import torch.utils.data as data_utils
 import pytorch_lightning as pl
 from collections import OrderedDict
-from torchtext import vocab
+from torchtext.vocab import Vocab
 import matplotlib.pyplot as plt
 import os
 import random

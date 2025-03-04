@@ -10,7 +10,7 @@ import torch.optim as optim
 import torch.utils.data as data_utils
 import pytorch_lightning as pl
 from collections import OrderedDict
-from torchtext import vocab
+from torchtext.vocab import Vocab
 import matplotlib.pyplot as plt
 import os
 import random
@@ -18,9 +18,9 @@ import pickle
 import csv
 
 # Set up Amino Acid Dictionary of Indices
-AAs = 'ACDEFGHIKLMNPQRSTVWY-' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
-aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
-aa2ind.set_default_index(20) # set unknown charcterers to gap
+AAs = 'ACDEFGHIKLMNPQRSTVWY-' 
+aa2ind = Vocab(OrderedDict([(a, 1) for a in AAs]), specials=[])  # Explicitly set specials=[]
+aa2ind.set_default_index(20)  
 
 # Simulated Annealing Class
 class SA_optimizer:
@@ -166,12 +166,17 @@ class seq_function_handler:
     def __init__(self, seq, models):
         self.seq = seq
         self.models = models
+
+        AAs = 'ACDEFGHIKLMNPQRSTVWY-'
+        aa2ind = Vocab(OrderedDict([(a, 1) for a in AAs]), specials=[])  # Explicitly set specials=[]
+        aa2ind.set_default_index(20)  
+        self.aa2ind = aa2ind
         
     def seq2fitness(self, seq):
         labels = []
 
         # Convert the sequence to tensor representation for model prediction
-        sequence_tensor = torch.tensor(aa2ind(list(seq)))
+        sequence_tensor = torch.tensor(self.aa2ind(list(seq)))
 
         # Score Sequence for all models
         with torch.no_grad():
