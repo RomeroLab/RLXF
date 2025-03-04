@@ -9,8 +9,6 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torch.utils.data as data_utils
 import pytorch_lightning as pl
-from collections import OrderedDict
-from torchtext import vocab
 import matplotlib.pyplot as plt
 import os
 import random
@@ -164,14 +162,13 @@ class seq_function_handler:
 
         AAs = 'ACDEFGHIKLMNPQRSTVWY-'  # Standard amino acids plus gap ('-')
         aa2ind = {aa: i for i, aa in enumerate(AAs)}  # Create dictionary for mapping
-        unknown_index = len(AAs)  # Assign unknown characters an index beyond known AAs
         self.aa2ind = aa2ind
         
     def seq2fitness(self, seq):
         labels = []
 
         # Convert the sequence to tensor representation
-        sequence_tensor = torch.tensor([self.aa2ind.get(a, unknown_index) for a in seq], dtype=torch.long).unsqueeze(0)
+        sequence_tensor = torch.tensor([self.aa2ind.get(a) for a in seq], dtype=torch.long).unsqueeze(0)
 
         # Score Sequence for all models
         with torch.no_grad():
