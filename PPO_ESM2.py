@@ -840,8 +840,6 @@ class PPO_ESM2(pl.LightningModule):
         # print(f"Learning rate after step: {new_lr:.6f}")
 
     def on_train_epoch_end(self):
-        # Check for unintentional memory buildup by running garbage collection periodically and monitoring memory
-        gc.collect()
 
         """ This function manually steps the scheduler at the end of each epoch. """
         self.num_seqs = min(self.num_seqs + self.inc_batch_size, self.max_batch_size) # Increase batch size each epoch until max size reached
