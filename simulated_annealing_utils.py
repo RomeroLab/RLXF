@@ -42,7 +42,7 @@ class SA_optimizer:
         self.close_sequences = []
 
 
-    def optimize(self, non_gap_indices, dir_path, wt_functional_threshold=None, start_mut=None):
+    def optimize(self, non_gap_indices, dir_path, num_mut, version, wt_functional_threshold=None, start_mut=None):
 
         # If no starting mutation is provided, generate one randomly
         if start_mut is None:
@@ -123,7 +123,7 @@ class SA_optimizer:
             self.fitness_trajectory.append([self.best_seq[1], current_seq[1]])
 
         # Define your directory path and file name
-        file_path = os.path.join(dir_path, f"close_sequences_{num_mut}mut_v{i}.pickle")
+        file_path = os.path.join(dir_path, f"close_sequences_{num_mut}mut_v{version}.pickle")
         # Serialize the list of close sequences to a pickle file
         with open(file_path, 'wb') as f:
             pickle.dump(self.close_sequences, f)
