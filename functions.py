@@ -32,13 +32,9 @@ from Bio import AlignIO
 import math
 import pathlib
 import warnings
-from reward_model import CNN
 from MLP import MLP
 from transformers import AutoModelForMaskedLM, AutoTokenizer
 from matplotlib.colors import LinearSegmentedColormap
-# from esm.models.esmc import ESMC
-# from esm.sdk.api import ESMProtein, LogitsConfig
-# from esm.sdk.forge import ESM3ForgeInferenceClient
 from conv_vae_model import ConvVAE
 
 # Training on GPU
