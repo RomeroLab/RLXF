@@ -27,9 +27,9 @@ percent_validation_split = 75 # defines percent of variants with num_muts_of_val
 learning_rate = 1e-6
 batch_size = 128
 epochs = 2000
-num_models = 100 # number of models in ensemble
+num_models = 10 # number of models in ensemble
 patience = 400 # patience for EarlyStopping, I recommend training ensemble for awhile after loss plateaus
-WT = 'MAGLRHTFVVADATLPDCPLVYASEGFYAMTGYGPDEVLGHNARFLQGEGTDPKEVQKIRDAIKKGEACSVRLLNYRKDGTPFWNLLTVTPIKTPDGRVSKFVGVQVDVTSKTEGKALA' # parent sequence
+WT = 'MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTLSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK' # parent sequence
 slen = len(WT) # length of parent sequence
 
 # load data
