@@ -176,7 +176,7 @@ class MLP(pl.LightningModule):
         self.ndim = self.embed.embedding_dim # dimensions of AA embedding
         
         # fully connected neural network
-        ldims = [self.slen*self.ndim,150,1]
+        ldims = [self.slen*self.ndim,400,1]
         self.dropout = nn.Dropout(p=0.1)
         self.linear_1 = nn.Linear(ldims[0], ldims[1])
         self.linear_2 = nn.Linear(ldims[1], ldims[2])
