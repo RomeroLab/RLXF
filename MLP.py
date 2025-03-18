@@ -124,11 +124,11 @@ class ProtDataModule(pl.LightningDataModule):
             
     #The DataLoader object is created using the train_ds/val_ds/test_ds objects with the batch size set during initialization of the class and shuffle=True.
     def train_dataloader(self):
-        return data_utils.DataLoader(self.train_ds, batch_size=self.batch_size, shuffle=True)
+        return data_utils.DataLoader(self.train_ds, batch_size=self.batch_size, shuffle=True, num_workers=32)
     def val_dataloader(self):
-        return data_utils.DataLoader(self.val_ds, batch_size=self.batch_size, shuffle=True)
+        return data_utils.DataLoader(self.val_ds, batch_size=self.batch_size, shuffle=True, num_workers=32)
     def test_dataloader(self):
-        return data_utils.DataLoader(self.test_ds, batch_size=self.batch_size, shuffle=True)
+        return data_utils.DataLoader(self.test_ds, batch_size=self.batch_size, shuffle=True, num_workers=32)
     
     def save_splits(self, path):
         """Save the data splits to a file at the given path"""
@@ -174,7 +174,7 @@ class MLP(pl.LightningModule):
         self.ndim = self.embed.embedding_dim # dimensions of AA embedding
         
         # fully connected neural network
-        ldims = [self.slen*self.ndim,100,1]
+        ldims = [self.slen*self.ndim,150,1]
         self.dropout = nn.Dropout(p=0.1)
         self.linear_1 = nn.Linear(ldims[0], ldims[1])
         self.linear_2 = nn.Linear(ldims[1], ldims[2])
@@ -201,6 +201,7 @@ class MLP(pl.LightningModule):
       
     def training_step(self, batch, batch_idx):
         sequence,scores = batch
+        sequence, scores = sequence.to(self.device), scores.to(self.device)
         scores = scores.unsqueeze(1)  # Add an extra dimension to the target tensor
         output = self(sequence)
         loss = nn.MSELoss()(output, scores) # Calculate MSE
@@ -209,6 +210,7 @@ class MLP(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         sequence,scores = batch
+        sequence, scores = sequence.to(self.device), scores.to(self.device)
         scores = scores.unsqueeze(1)  # Add an extra dimension to the target tensor
         output = self(sequence)
         loss = nn.MSELoss()(output, scores) # Calculate MSE

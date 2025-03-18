@@ -47,14 +47,18 @@ dm = ProtDataModule(df, num_muts_threshold, num_muts_of_val_test_splits, percent
 # ############################################################## train reward models ##############################################################
 model_savepath = './reward_models'
 os.makedirs(model_savepath, exist_ok=True)
+
+# Check if a GPU is available and set the trainer to use it
 for i in range(num_models):
     model = MLP(learning_rate, batch_size, epochs, slen) # Resubstantiate the model for each training iteration
+    model = model.to('cuda' if torch.cuda.is_available() else 'cpu')  # Move model to GPU if available
     print(f"Model {i} is trained on: {model.device}")
+    
     logger_name = f'reward_model'
     logger = CSVLogger('logs', name=logger_name)
     checkpoint_callback = ModelCheckpoint(dirpath=model_savepath,filename=f'reward_model_v{i}',monitor='val_loss',mode='min',save_top_k=1) # Define the model checkpoint callback with version number in the filename
     early_stopping = EarlyStopping(monitor='val_loss', patience=patience, mode='min') # Use early stopping
-    trainer = pl.Trainer(logger=logger, max_epochs=epochs, callbacks=[early_stopping, checkpoint_callback], enable_progress_bar=False) # Trainer with early stopping and checkpointing
+    trainer = pl.Trainer(logger=logger, max_epochs=epochs, callbacks=[early_stopping, checkpoint_callback], enable_progress_bar=False, devices="auto", accelerator="auto") # Trainer with early stopping and checkpointing
     trainer.fit(model, dm) # Train the model
     metrics_file_name = f'metrics.csv'
     pt_metrics = pd.read_csv(f'logs/reward_model/version_{i}/metrics.csv')
