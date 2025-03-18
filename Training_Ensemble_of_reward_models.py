@@ -25,10 +25,10 @@ num_muts_threshold = 4 # variants with this number of mutations or less will be 
 num_muts_of_val_test_splits = 5 # variants with this number of mutations will be split into validation and test sets
 percent_validation_split = 75 # defines percent of variants with num_muts_of_val_test_splits mutations to be in validation set
 learning_rate = 1e-6
-batch_size = 128
-epochs = 2000
+batch_size = 64
+epochs = 200
 num_models = 10 # number of models in ensemble
-patience = 400 # patience for EarlyStopping, I recommend training ensemble for awhile after loss plateaus
+patience = 40 # patience for EarlyStopping, I recommend training ensemble for awhile after loss plateaus
 WT = 'MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTLSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK' # parent sequence
 slen = len(WT) # length of parent sequence
 
