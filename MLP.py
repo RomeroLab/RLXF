@@ -22,17 +22,19 @@ class SeqFcnDataset(torch.utils.data.Dataset):
 
     def __init__(self, data_frame):
         self.data_df = data_frame
-
-    def __getitem__(self, idx):
         AAs = 'ACDEFGHIKLMNPQRSTVWY' # setup torchtext vocab to map AAs to indices for reward models
         aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
         aa2ind.set_default_index(20) # set unknown charcterers to gap
-        sequence = torch.tensor(aa2ind(list(self.data_df.sequence.iloc[idx]))) # Extract sequence at index idx
+        self.aa2ind = aa2ind
+
+    def __getitem__(self, idx):
+        sequence = torch.tensor(self.aa2ind(list(self.data_df.sequence.iloc[idx]))) # Extract sequence at index idx
         labels = torch.tensor(self.data_df.iloc[idx]['functional_score']).float()
         return sequence, labels
 
     def __len__(self):
         return len(self.data_df)
+
 
 # A PyTorch Lightning Data Module to handle data splitting.
 class ProtDataModule(pl.LightningDataModule):
