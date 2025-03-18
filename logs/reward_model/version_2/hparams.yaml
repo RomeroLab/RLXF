@@ -1,0 +1,4 @@
+batch_size: 128
+epochs: 200
+learning_rate: 1.0e-06
+slen: 238
