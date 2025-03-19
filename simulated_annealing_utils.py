@@ -117,7 +117,7 @@ class SA_optimizer:
             ###############################################################################################
             # Printing first few accept probabilities. We want this to be 30-50%, preferrably 30-40%, but the overall SA curves appearance is more important
             accept_prob = np.exp(min([0, delta_F / (T)]))
-            # print(f"Acceptance probability: {accept_prob}")
+            print(f"Acceptance probability: {accept_prob}")
             ###############################################################################################
             
             if np.exp(min([0, delta_F / (T)])) > random.random():  # calculate the acceptance probability based on the temperature and delta_F
