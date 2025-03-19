@@ -39,7 +39,7 @@ from functions import (generate_df, generate_and_evaluate_mutants_p_sampling)
 ################################################## hyperparameters ##################################################
 
 # parameters to update
-sft_logger_versions = 0
+sft_logger_versions = [0, 0, 0, 0]
 model_identifiers = ['esm2_t6_8M_UR50D', 'esm2_t12_35M_UR50D', 'esm2_t30_150M_UR50D', 'esm2_t33_650M_UR50D']
 for sft_logger_version, model_identifier in zip(sft_logger_versions, model_identifiers):
     print(f"Model Identifier: {model_identifier}, SFT Logger Version: {sft_logger_version}")
