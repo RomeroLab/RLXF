@@ -106,7 +106,7 @@ def generate_heatmap(WT, probabilities, model_identifier, sequence, filepath, ep
         if token_id in all_token_ids:  # Check if the token exists in the token list
             token_index = all_token_ids.index(token_id)
             dot_color = 'red' if token != WT[pos] else 'black' # Set dot color based on whether it matches WT or is a mutation
-            plt.scatter(pos + 0.5, token_index + 0.5, color=dot_color, s=30)  # Adjust dot size as needed
+            plt.scatter(pos + 0.5, token_index + 0.5, color=dot_color, s=10)  # Adjust dot size as needed
     legend_elements = [plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='black', markersize=10, label='WT'),
                        plt.Line2D([0], [0], marker='o', color='w', markerfacecolor='red', markersize=10, label='Mutation')]
     plt.legend(handles=legend_elements, loc='upper right')
