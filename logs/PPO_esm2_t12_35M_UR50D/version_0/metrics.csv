@@ -1,0 +1,5 @@
+kl_divergence,mean_ratio_initial_iter,median_ratio_initial_iter,pairwise_hd_aver,mean_hd_from_CreiLOV,fitness_advantage,total_reward,ppo_loss_initial_iter,num_muts,aver_num_masks_to_add_muts,batch_size,epoch,step,rel_WT_fitness,max_norm
+0.0,1.0,1.0,24.0,15.0,0.8722888827323914,0.8723129034042358,-0.87109375,15.0,14.5,2.0,0,0,,
+,,,,,,,,,,,0,0,0.8722888827323914,0.33047670125961304
+0.018062811344861984,1.0625,1.0,22.666667938232422,15.0,0.9052817821502686,0.9053044319152832,-0.91796875,15.0,13.0,3.0,1,1,,
+,,,,,,,,,,,1,1,0.9052817821502686,0.5405358076095581
