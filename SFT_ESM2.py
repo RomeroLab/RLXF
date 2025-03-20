@@ -72,7 +72,9 @@ class SFTDataModule(pl.LightningDataModule):
 
 # Running SFT
 class SFT_ESM2(pl.LightningModule):
-    def __init__(self, ESM2, reward_models,
+    def __init__(self, 
+        WT,
+        ESM2, reward_models,
                     seed,
                     learning_rate, lr_mult, lr_mult_factor,
                     WD, grad_clip_threshold, 
@@ -129,7 +131,7 @@ class SFT_ESM2(pl.LightningModule):
             self.learning_rate *= self.lr_mult # update learning rate
 
         # parameters for custom training
-        self.WT = 'MAGLRHTFVVADATLPDCPLVYASEGFYAMTGYGPDEVLGHNARFLQGEGTDPKEVQKIRDAIKKGEACSVRLLNYRKDGTPFWNLLTVTPIKTPDGRVSKFVGVQVDVTSKTEGKALA' # CreiLOV
+        self.WT = WT
         self.automatic_optimization = False
         optimizers_config = self.configure_optimizers()
         self.optimizer = optimizers_config["optimizer"]
@@ -163,22 +165,6 @@ class SFT_ESM2(pl.LightningModule):
         mask_token_id = self.tokenizer.convert_tokens_to_ids('<mask>')
         mask = inputs['input_ids'] == mask_token_id
         
-        # # Print the shapes of the tensors to check their sizes
-        # print(f"mask shape: {mask.shape}")  # Shape of the mask
-        # print(f"mask (masked sequence positions): {mask}")  # Actual mask tensor
-
-        # # Logits and labels length comparison
-        # print(f"logits shape: {logits.shape}")  # Shape of the logits
-        # print(f"labels shape: {labels.shape}")  # Shape of the labels
-
-        # # Optionally print the actual logits and labels, but keep in mind it might be large depending on batch size
-        # print(f"logits: {logits}")  # Logits tensor
-        # print(f"labels: {labels}")  # Labels tensor
-
-        # # Additional logging to see the batch size and lengths of input sequences
-        # print(f"Sequence size: {len(masked_seqs[0])}")
-        # print(f"Masked sequence: {masked_seqs}")
-
         # Filter logits and labels to consider only masked positions for loss calculation
         masked_logits = logits[mask]
         masked_labels = labels[mask]
@@ -197,40 +183,6 @@ class SFT_ESM2(pl.LightningModule):
         self.lr_scheduler_step(self.scheduler, 0, None)
 
         last_batch = batch_idx == self.trainer.num_training_batches - 1
-        if last_batch:
-            print(f"Generating scores for sequences from model for logger...")
-            try:
-                if self.current_epoch == self.epochs - 1:
-                    _, sft_scores_np = generate_and_evaluate_mutants_max_sampling(num_designs=1000,
-                                                                                num_muts=5,
-                                                                                WT=self.WT,
-                                                                                reward_models=self.reward_models,
-                                                                                model=self.model_being_updated,
-                                                                                seed=42)
-                else:
-                    _, sft_scores_np = generate_and_evaluate_mutants_max_sampling(num_designs=1000,
-                                                                                num_muts=5,
-                                                                                WT=self.WT,
-                                                                                reward_models=self.reward_models,
-                                                                                model=self.model_being_updated,
-                                                                                seed=42)
-
-                # Calculate statistics
-                scores = np.median(sft_scores_np, axis=0)
-                max_score = scores.max()
-                median_score = np.median(scores)
-                mean_score = scores.mean()
-
-                self.current_mean_score = mean_score.item()
-                self.current_max_score = max_score.item()
-
-                # Log statistics
-                self.log('max_score', max_score, on_step=True, on_epoch=False, prog_bar=False, logger=True, batch_size=self.batch_size)
-                self.log('median_score', median_score, on_step=True, on_epoch=False, prog_bar=False, logger=True, batch_size=self.batch_size)
-                self.log('mean_score', mean_score, on_step=True, on_epoch=False, prog_bar=False, logger=True, batch_size=self.batch_size)
-
-            except Exception as e:
-                print(f"Failed to generate or evaluate mutants: {str(e)}")
 
     def add_random_masks(self, seqs, tokenizer, num_masks=15):
         mask_token = tokenizer.mask_token  # Get the actual mask token string from the tokenizer

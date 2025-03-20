@@ -23,7 +23,7 @@ from functions import (mask_mutations, generate_df, generate_and_evaluate_mutant
 from SFT_ESM2 import (SFT_ESM2, SFTDataModule)
 
 # Parameters to update
-WT = 'MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTLSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK' # CreiLOV
+WT = 'MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTLSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK'
 sequence_length = len(WT)
 num_reward_models = 10
 
@@ -100,7 +100,7 @@ for model_identifier in model_identifiers:
     logger = CSVLogger('logs', name=logger_name, version=None)
     version = logger.version # Retrieve the version number from the logger
     dm = SFTDataModule(df, batch_size, seed)
-    model = SFT_ESM2(ESM2, reward_models, seed, learning_rate, lr_mult, lr_mult_factor, WD, grad_clip_threshold, epochs, num_unfrozen_layers, num_layers_unfreeze_each_epoch, max_num_layers_unfreeze_each_epoch, batch_size, random_masking, model_identifier)
+    model = SFT_ESM2(WT, ESM2, reward_models, seed, learning_rate, lr_mult, lr_mult_factor, WD, grad_clip_threshold, epochs, num_unfrozen_layers, num_layers_unfreeze_each_epoch, max_num_layers_unfreeze_each_epoch, batch_size, random_masking, model_identifier)
     trainer = pl.Trainer(logger=logger, max_epochs=epochs, enable_progress_bar=False, log_every_n_steps=1, accelerator = "gpu", devices = 1)
     trainer.fit(model,dm)
 
