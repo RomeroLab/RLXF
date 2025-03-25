@@ -63,7 +63,7 @@ for sft_logger_version, model_identifier in zip(sft_logger_versions, model_ident
 
     # training hyperparameters
     seed = 2549
-    epochs = 2
+    epochs = 4
     iterations = 1
     num_updates = max(1, int((epochs / 100) * iterations)) # First restart occurs at 10 epochs (backprop will have occured 10*iterations times)
 
