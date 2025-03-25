@@ -6,8 +6,8 @@ __pycache__/
 # ignore log files from server runs
 *.out
 
-# ignore large model files
-*.ckpt
+# # ignore large model files
+# *.ckpt
 *.pt
 
 # C extensions
