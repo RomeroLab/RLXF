@@ -63,18 +63,16 @@ for sft_logger_version, model_identifier in zip(sft_logger_versions, model_ident
 
     # training hyperparameters
     seed = 2549
-    epochs = 2
+    epochs = 4
     iterations = 1
     num_updates = max(1, int((epochs / 100) * iterations)) # First restart occurs at 10 epochs (backprop will have occured 10*iterations times)
 
     # generating design hyperparameters
     WT = 'MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTLSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK'
-    num_sequences = 4 # initial batch size during PPO
+    num_sequences = 2 # initial batch size during PPO
     inc_batch_size = 1 # increasing batch size each epoch until max_batch_size reached
     max_batch_size = 10 # max batch size (dependent on GPU memory)
-    num_mutations = 10 # number of mutations to add to WT
-    high_conf_threshold = 0.9 # initial probability threshold to be considered high confidence mutation
-    cum_prob_threshold = 0.22164310879955906 # initial cumulative probability threshold of non-WT resides to be considered candidate position to explore mutating
+    num_mutations = 6 # number of mutations to add to WT
 
     # important PPO hyperparameters
     rel_to_WT = 1 # compare designs to WT or pretrained designs
@@ -93,7 +91,7 @@ for sft_logger_version, model_identifier in zip(sft_logger_versions, model_ident
     num_designs = 100
     num_muts = 5
     high_conf_threshold = 0.9
-    cum_prob_threshold = 0.25
+    cum_prob_threshold = 0.2
     ep = epochs - 1
     generation_seed = 7028
     predicted_wt_score = 1.1498 # predicted wildtype score as reference for evaluations
