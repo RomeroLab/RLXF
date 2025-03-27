@@ -90,7 +90,7 @@ for epochs in epoch_list:
         save_filepath = f'./logs/{filepath}_{model_identifier}'
 
         # parameters for generating designs after alignment
-        num_designs = 100
+        num_designs = 1000
         num_muts = num_mutations
         high_conf_threshold = 0.9
         cum_prob_threshold = 0.2
