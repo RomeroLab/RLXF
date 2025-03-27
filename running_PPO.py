@@ -38,7 +38,7 @@ from functions import (generate_df, generate_and_evaluate_mutants_p_sampling)
 
 ################################################## hyperparameters ##################################################
 
-epoch_list = [3]
+epoch_list = [3, 6, 9]
 for epochs in epoch_list:
     # parameters to update
     sft_logger_versions = [0, 0, 0, 0]
@@ -91,7 +91,7 @@ for epochs in epoch_list:
 
         # parameters for generating designs after alignment
         num_designs = 100
-        num_muts = 10
+        num_muts = num_mutations
         high_conf_threshold = 0.9
         cum_prob_threshold = 0.2
         ep = epochs - 1
