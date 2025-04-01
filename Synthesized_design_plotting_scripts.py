@@ -39,21 +39,39 @@ import scipy
 
 # load mutants for kde plot
 esm2_models = ['esm2_t6_8M_UR50D', 'esm2_t12_35M_UR50D', 'esm2_t30_150M_UR50D', 'esm2_t33_650M_UR50D']
+version = 4
+WT_name = "avGFP"
+
+# create folder structure it doesn't exist
+if not os.path.exists('logs/Aligning_SFT_ESM2s_wpPPO'):
+    os.makedirs('logs/Aligning_SFT_ESM2s_wpPPO')
+
+if not os.path.exists('logs/Aligning_SFT_ESM2s_wpPPO/figures'):
+    os.makedirs('logs/Aligning_SFT_ESM2s_wpPPO/figures')
+    os.makedirs('logs/Aligning_SFT_ESM2s_wpPPO/figures/8M')
+    os.makedirs('logs/Aligning_SFT_ESM2s_wpPPO/figures/35M')
+    os.makedirs('logs/Aligning_SFT_ESM2s_wpPPO/figures/150M')
+    os.makedirs('logs/Aligning_SFT_ESM2s_wpPPO/figures/650M')
+
+if not os.path.exists(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}'):
+    os.makedirs(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}')
+    os.makedirs(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}/8M')
+    os.makedirs(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}/35M')
+    os.makedirs(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}/150M')
+    os.makedirs(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}/650M')
+
 
 for huggingface_identifier in esm2_models:
     dir_filepath = f'logs/PPO_{huggingface_identifier}' # ! update
     model_size = huggingface_identifier.split('_')[2]
 
     # Load mutants from pretrained ESM2 650M
-    version = 4
     fixed_scores_np = np.load(f'{dir_filepath}/version_{version}/fixed_{huggingface_identifier}_scores.npy') # ! update
 
     # Load sft mutants
-    version = 4
     sft_scores_np = np.load(f'{dir_filepath}/version_{version}/sft_{huggingface_identifier}_scores.npy') # ! update
 
     # Load rl mutants
-    version = 4
     rl_scores_np = np.load(f'{dir_filepath}/version_{version}/ema_aligned_{huggingface_identifier}_scores.npy') # ! update
 
 
@@ -69,7 +87,7 @@ for huggingface_identifier in esm2_models:
     sns.kdeplot(np.median(sft_scores_np, axis=0), color='#92c5de', ax=ax, linewidth=2.5, fill=True, alpha=alpha, label=f'SFT ESM2 ({model_size})')
     sns.kdeplot(np.median(rl_scores_np, axis=0), color='#2166ac', ax=ax, linewidth=2.5, fill=True, alpha=alpha, label=f'Aligned ESM2 ({model_size})')
 
-    ax.axvline(predicted_log_mean_wt_score, color='black', linestyle='--', linewidth=1, label='Predicted CreiLOV log fluorescence')
+    ax.axvline(predicted_log_mean_wt_score, color='black', linestyle='--', linewidth=1, label=f'Predicted {WT_name} score')
 
     ax.set_xlabel('Predicted Fluorescence', fontsize=12)
     ax.set_ylabel('Density', fontsize=14)
@@ -87,12 +105,12 @@ for huggingface_identifier in esm2_models:
 
 
     # Load the data
-    ema_filepath = f"logs/PPO_{huggingface_identifier}/version_4/ema_aligned_{huggingface_identifier}_mutated_designs_scores_ep2.csv" # ! update
-    fixed_filepath = f"logs/PPO_{huggingface_identifier}/version_4/{huggingface_identifier}_fixed_mutated_designs_scores.csv" # ! update
+    ema_filepath = f"logs/PPO_{huggingface_identifier}/version_4/ema_aligned_{huggingface_identifier}_mutated_designs_scores_ep2.csv"
+    fixed_filepath = f"logs/PPO_{huggingface_identifier}/version_4/{huggingface_identifier}_fixed_mutated_designs_scores.csv"
 
-    ema_df = pd.read_csv(ema_filepath)[["Sequence"]]
+    ema_df = pd.read_csv(ema_filepath)[["Sequence"]].head(30)
     ema_df["Model"] = f"Aligned_ESM2_{model_size}"
-    fixed_df = pd.read_csv(fixed_filepath)[["Sequence"]]
+    fixed_df = pd.read_csv(fixed_filepath)[["Sequence"]].head(30)
     fixed_df['Model'] = f"Pretrained_ESM2_{model_size}"
 
     df = pd.concat([ema_df, fixed_df], ignore_index=True)
@@ -139,21 +157,22 @@ for huggingface_identifier in esm2_models:
     # Display the resulting DataFrame
     print(mutation_difference_df.T)
 
-
-    # Create a custom colormap, setting white as the center
-    colors = [(0, '#B2182B'), (0.5, 'white'), (1, '#2166AC')]
-    cmap_name = 'custom'
-    custom_cmap_1 = LinearSegmentedColormap.from_list(cmap_name, colors)
-
     # Find min and max scores to properly set the colormap range
     min_score_1 = np.min(mutation_difference_df)
     max_score_1 = np.max(mutation_difference_df)
 
     # Calculate the position of 0 in the colormap
     midpoint = abs(min_score_1) / (max_score_1 - min_score_1)
+    midpoint = midpoint.values[0]
+
+
+    # Create a custom colormap, setting white as the center
+    colors = [(0, '#B2182B'), (midpoint, 'white'), (1, '#2166AC')]
+    cmap_name = 'custom'
+    custom_cmap_1 = LinearSegmentedColormap.from_list(cmap_name, colors)
 
     # Create figure
-    fig, ax = plt.subplots(figsize=(27, 10))
+    fig, ax = plt.subplots(figsize=(sequence_length/4.5, 10))
 
     # Plot the heatmap
     sns.heatmap(mutation_difference_df.T, cmap=custom_cmap_1, vmin=min_score_1, vmax=max_score_1, square=True, cbar=True, 
@@ -242,7 +261,7 @@ for huggingface_identifier in esm2_models:
     custom_cmap_2 = LinearSegmentedColormap.from_list(cmap_name, colors)
 
     # Create figure
-    fig, ax = plt.subplots(figsize=(27, 10))
+    fig, ax = plt.subplots(figsize=(sequence_length/4.5, 10))
 
     # Plot the heatmap
     sns.heatmap(entropy_difference_df.T, cmap=custom_cmap_2, vmin=min_score_2, vmax=max_score_2, square=True, cbar=True, 
@@ -353,7 +372,7 @@ for huggingface_identifier in esm2_models:
 
     # Define amino acid dictionary for tokenization, define WT for length of context window
     AAs = 'ACDEFGHIKLMNPQRSTVWY' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
-    WT = 'MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTLSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK' # CreiLOV
+    WT = 'MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTLSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK'
     aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
     aa2ind.set_default_index(20) # set unknown charcterers to gap
     sequence_length = len(WT)
@@ -774,7 +793,7 @@ for huggingface_identifier in esm2_models:
     df_strip = pd.DataFrame(strip_rows)
 
     # Add predicted wild-type score line
-    ax1.axhline(predicted_wt_score, color='black', linestyle='--', linewidth=WT_linewidth, label='Predicted CreiLOV log fluorescence')
+    ax1.axhline(predicted_wt_score, color='black', linestyle='--', linewidth=WT_linewidth, label=f'Predicted {WT_name} score')
 
     # plot scores
     sns.stripplot(x='Number of Mutations', y='Predicted Log Fluorescence', hue='Model', data=df_strip, ax=ax1, jitter=True, dodge=True)
