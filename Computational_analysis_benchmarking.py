@@ -41,6 +41,7 @@ import scipy
 esm2_models = ['esm2_t6_8M_UR50D', 'esm2_t12_35M_UR50D', 'esm2_t30_150M_UR50D', 'esm2_t33_650M_UR50D']
 num_reward_models = 10
 version = 8
+sft_version = 0
 ep = 5
 
 # Define avGFP sequence
@@ -349,7 +350,7 @@ for huggingface_identifier in esm2_models:
         generate_pretrained_designs = True
         generate_sft_designs = True
         sft_model_exists = True
-        sft_model_filepath = f'./logs/Aligning_SFT_ESM2s_wpPPO/version_{version}/{model_size}' # ! update
+        sft_model_filepath = f'./logs/Aligning_SFT_ESM2s_wpPPO/version_{sft_version}/{model_size}' # ! update
         sft_model_name = f'SFT_{huggingface_identifier}_v0' # ! update
 
         # Generate designs from aligned model
