@@ -57,25 +57,25 @@ num_muts_list = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 high_conf_threshold = 0.9
 cum_prob_threshold = 0.25
 seed = 7028
-filepath = './logs/Aligning_SFT_ESM2s_wpPPO'
+filepath = './logs'
 
 # create folder structure it doesn't exist
-if not os.path.exists('logs/Aligning_SFT_ESM2s_wpPPO'):
-    os.makedirs('logs/Aligning_SFT_ESM2s_wpPPO')
+if not os.path.exists('logs'):
+    os.makedirs('logs')
 
-if not os.path.exists('logs/Aligning_SFT_ESM2s_wpPPO/figures'):
-    os.makedirs('logs/Aligning_SFT_ESM2s_wpPPO/figures')
-    os.makedirs('logs/Aligning_SFT_ESM2s_wpPPO/figures/8M')
-    os.makedirs('logs/Aligning_SFT_ESM2s_wpPPO/figures/35M')
-    os.makedirs('logs/Aligning_SFT_ESM2s_wpPPO/figures/150M')
-    os.makedirs('logs/Aligning_SFT_ESM2s_wpPPO/figures/650M')
+if not os.path.exists('logs/figures'):
+    os.makedirs('logs/figures')
+    os.makedirs('logs/figures/8M')
+    os.makedirs('logs/figures/35M')
+    os.makedirs('logs/figures/150M')
+    os.makedirs('logs/figures/650M')
 
-if not os.path.exists(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}'):
-    os.makedirs(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}')
-    os.makedirs(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}/8M')
-    os.makedirs(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}/35M')
-    os.makedirs(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}/150M')
-    os.makedirs(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}/650M')
+if not os.path.exists(f'logs/version_{version}'):
+    os.makedirs(f'logs/version_{version}')
+    os.makedirs(f'logs/version_{version}/8M')
+    os.makedirs(f'logs/version_{version}/35M')
+    os.makedirs(f'logs/version_{version}/150M')
+    os.makedirs(f'logs/version_{version}/650M')
 
 # load ensemble of reward models
 reward_models = []
@@ -125,8 +125,8 @@ for huggingface_identifier in esm2_models:
     plt.tight_layout()
 
     # Save the plot
-    plt.savefig(f'logs/Aligning_SFT_ESM2s_wpPPO/figures/{model_size}/ppo_sft_pretrained_esm2_design_scores.svg')
-    plt.savefig(f'logs/Aligning_SFT_ESM2s_wpPPO/figures/{model_size}/ppo_sft_pretrained_esm2_design_scores.png')
+    plt.savefig(f'logs/figures/{model_size}/ppo_sft_pretrained_esm2_design_scores.svg')
+    plt.savefig(f'logs/figures/{model_size}/ppo_sft_pretrained_esm2_design_scores.png')
 
     # Load the data
     ema_filepath = f"logs/PPO_{huggingface_identifier}/ema_aligned_{huggingface_identifier}_mutated_designs_scores_ep{ep}.csv"
@@ -180,8 +180,8 @@ for huggingface_identifier in esm2_models:
     ax.set_xticklabels(list(WT))
     ax.xaxis.set_ticks_position('top')
     ax.tick_params(axis='x', labeltop=True, labelbottom=False)
-    plt.savefig(f'logs/Aligning_SFT_ESM2s_wpPPO/figures/{model_size}/Mutational_Freq_All_Models.svg')
-    plt.savefig(f'logs/Aligning_SFT_ESM2s_wpPPO/figures/{model_size}/Mutational_Freq_All_Models.png')
+    plt.savefig(f'logs/figures/{model_size}/Mutational_Freq_All_Models.svg')
+    plt.savefig(f'logs/figures/{model_size}/Mutational_Freq_All_Models.png')
 
     # Function to convert counts to probabilities
     def counts_to_probabilities(arr: np.ndarray):
@@ -247,8 +247,8 @@ for huggingface_identifier in esm2_models:
     ax.set_xticklabels(list(WT))
     ax.xaxis.set_ticks_position('top')
     ax.tick_params(axis='x', labeltop=True, labelbottom=False)
-    plt.savefig(f'logs/Aligning_SFT_ESM2s_wpPPO/figures/{model_size}/Shannon_Entropy_All_Models.svg')
-    plt.savefig(f'logs/Aligning_SFT_ESM2s_wpPPO/figures/{model_size}/Shannon_Entropy_All_Models.png')
+    plt.savefig(f'logs/figures/{model_size}/Shannon_Entropy_All_Models.svg')
+    plt.savefig(f'logs/figures/{model_size}/Shannon_Entropy_All_Models.png')
 
     # Provided mutation frequency data
     mutation_data = {'Aligned_ESM2': mutation_df.iloc[0], 'Pre_trained_ESM2': mutation_df.iloc[1]}
@@ -321,9 +321,9 @@ for huggingface_identifier in esm2_models:
 
         # Save color scale as SVG
         color_map = LinearSegmentedColormap.from_list("mutation_scale", [base_grey, target_red])
-        create_color_scale_svg(color_map, f"logs/Aligning_SFT_ESM2s_wpPPO/figures/{model_size}/color_scale_{model}.svg")
+        create_color_scale_svg(color_map, f"logs/figures/{model_size}/color_scale_{model}.svg")
 
-        script_filename = f"logs/Aligning_SFT_ESM2s_wpPPO/figures/{model_size}/color_{WT_name}_{model}.pml"
+        script_filename = f"logs/figures/{model_size}/color_{WT_name}_{model}.pml"
         with open(script_filename, "w") as file:
             file.write(pymol_script)
 
@@ -349,7 +349,7 @@ for huggingface_identifier in esm2_models:
         generate_pretrained_designs = True
         generate_sft_designs = True
         sft_model_exists = True
-        sft_model_filepath = f'./logs/Aligning_SFT_ESM2s_wpPPO/version_{sft_version}/{model_size}' # ! update
+        sft_model_filepath = f'./logs/version_{sft_version}/{model_size}' # ! update
         sft_model_name = f'SFT_{huggingface_identifier}_v0' # ! update
 
         # Generate designs from aligned model
@@ -425,7 +425,7 @@ for huggingface_identifier in esm2_models:
     # Generate mutational extrapolation plot
     model_prefixes = ['fixed_', 'sft_', 'rl_']
     model_labels = {'fixed_': 'Pre-trained', 'sft_': 'SFT', 'rl_': 'PPO'}
-    dir_filepath = f'./logs/Aligning_SFT_ESM2s_wpPPO/version_{version}/{model_size}'
+    dir_filepath = f'./logs/version_{version}/{model_size}'
 
     # Initialize dictionary to store score lists for each model prefix
     score_dict = {prefix: [] for prefix in model_prefixes}
@@ -505,6 +505,6 @@ for huggingface_identifier in esm2_models:
     ax2.legend(fontsize=10)
 
     plt.tight_layout()
-    plt.savefig(f'logs/Aligning_SFT_ESM2s_wpPPO/figures/{model_size}/mutational_extrapolation_vs_pretrained.svg')
-    plt.savefig(f'logs/Aligning_SFT_ESM2s_wpPPO/figures/{model_size}/mutational_extrapolation_vs_pretrained.png')
+    plt.savefig(f'logs/figures/{model_size}/mutational_extrapolation_vs_pretrained.svg')
+    plt.savefig(f'logs/figures/{model_size}/mutational_extrapolation_vs_pretrained.png')
     plt.show()
