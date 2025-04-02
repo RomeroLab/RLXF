@@ -39,7 +39,7 @@ import scipy
 
 # load mutants for kde plot
 esm2_models = ['esm2_t6_8M_UR50D', 'esm2_t12_35M_UR50D', 'esm2_t30_150M_UR50D', 'esm2_t33_650M_UR50D']
-version = 4
+version = 8
 WT_name = "avGFP"
 
 # create folder structure it doesn't exist
@@ -59,7 +59,6 @@ if not os.path.exists(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}'):
     os.makedirs(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}/35M')
     os.makedirs(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}/150M')
     os.makedirs(f'logs/Aligning_SFT_ESM2s_wpPPO/version_{version}/650M')
-
 
 for huggingface_identifier in esm2_models:
     dir_filepath = f'logs/PPO_{huggingface_identifier}' # ! update
@@ -281,8 +280,6 @@ for huggingface_identifier in esm2_models:
 
     # Provided mutation frequency data
     mutation_data = {
-        # 'Aligned_VAE': mutation_df.iloc[2],
-        # 'Pre_trained_VAE': mutation_df.iloc[3],
         'Aligned_ESM2': mutation_df.iloc[0],
         'Pre_trained_ESM2': mutation_df.iloc[1]}
 
