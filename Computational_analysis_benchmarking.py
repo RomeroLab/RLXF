@@ -255,6 +255,8 @@ for huggingface_identifier in esm2_models:
     base_grey = hex_to_rgb('#f0f0f0')  # Base color for no mutation
     target_red = hex_to_rgb('#ef3b2c')  # Adjusted target red for high mutation
     fad_blue = hex_to_rgb('#f0f0f0')   # Same as base color for no mutation
+    aligned_red = hex_to_rgb('#2166AC')
+    pretrain_blue = hex_to_rgb('#B2182B')
 
     # Normalize the mutation frequencies for each model
     normalized_data = {model: mutations / np.max(mutations) for model, mutations in mutation_data.items()}
@@ -317,8 +319,9 @@ for huggingface_identifier in esm2_models:
     pretrain = normalized_data['Pre_trained_ESM2']
 
     for i, (a, p) in enumerate(zip(aligned, pretrain)):
-        if a == 0 and p == 0:
-            continue  # skip unmutated
+        # Grey if both are zero or equal
+        if (a == 0 and p == 0) or (a == p):
+            color = base_grey
 
         if a >= p:
             scaled = 1 - (1 - a)**2
