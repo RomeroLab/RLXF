@@ -129,7 +129,7 @@ for huggingface_identifier in esm2_models:
     plt.savefig(f'logs/Aligning_SFT_ESM2s_wpPPO/figures/{model_size}/ppo_sft_pretrained_esm2_design_scores.png')
 
     # Load the data
-    ema_filepath = f"logs/PPO_{huggingface_identifier}//ema_aligned_{huggingface_identifier}_mutated_designs_scores_ep2.csv"
+    ema_filepath = f"logs/PPO_{huggingface_identifier}/ema_aligned_{huggingface_identifier}_mutated_designs_scores_ep{ep}.csv"
     fixed_filepath = f"logs/PPO_{huggingface_identifier}/version_{version}/{huggingface_identifier}_fixed_mutated_designs_scores.csv"
 
     ema_df = pd.read_csv(ema_filepath)[["Sequence"]].head(30)
