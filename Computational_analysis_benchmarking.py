@@ -364,7 +364,7 @@ for huggingface_identifier in esm2_models:
     shutil.copyfile(f"{WT_name}_AF3.pdb", f'./logs/figures/{model_size}/{WT_name}_AF3.pdb')
 
     print(f"Overlay PyMOL script saved as '{overlay_filename}'.")
-    print(f"PDB file copied to '{overlay_dir}/{WT_name}_AF3.pdb'.")
+    print(f"PDB file copied to './logs/figures/{model_size}/{WT_name}_AF3.pdb")
 
     ################################################################################################################
     # Define amino acid dictionary for tokenization, define WT for length of context window
