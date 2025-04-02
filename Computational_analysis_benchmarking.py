@@ -41,7 +41,7 @@ import scipy
 esm2_models = ['esm2_t6_8M_UR50D', 'esm2_t12_35M_UR50D', 'esm2_t30_150M_UR50D', 'esm2_t33_650M_UR50D']
 num_reward_models = 10
 version = 8
-ep = 2
+ep = 5
 
 # Define avGFP sequence
 WT_name = "avGFP"
