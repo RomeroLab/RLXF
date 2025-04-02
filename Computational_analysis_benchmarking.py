@@ -54,7 +54,7 @@ slen = len(WT)
 
 # generating designs
 num_designs = 50
-num_muts_list = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
+num_muts_list = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 high_conf_threshold = 0.9
 cum_prob_threshold = 0.25
 seed = 7028
