@@ -36,6 +36,8 @@ from pytorch_lightning.callbacks import Callback
 from matplotlib.colors import LinearSegmentedColormap
 import scipy
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+torch.set_num_threads(20)
 
 # load mutants for kde plot
 esm2_models = ['esm2_t6_8M_UR50D', 'esm2_t12_35M_UR50D', 'esm2_t30_150M_UR50D', 'esm2_t33_650M_UR50D']
@@ -332,9 +334,6 @@ for huggingface_identifier in esm2_models:
     AAs = 'ACDEFGHIKLMNPQRSTVWY' # setup torchtext vocab to map AAs to indices, usage is aa2ind(list(AAsequence))
     aa2ind = vocab.vocab(OrderedDict([(a, 1) for a in AAs]))
     aa2ind.set_default_index(20) # set unknown charcterers to gap
-    slen = len(WT)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    torch.set_num_threads(20)
 
     # Shared parameters for generating designs from pretrained, sft, and aligned models
     pretrained_ESM2 = AutoModelForMaskedLM.from_pretrained(f"facebook/{huggingface_identifier}")
