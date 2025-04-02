@@ -64,18 +64,18 @@ if not os.path.exists('logs'):
     os.makedirs('logs')
 
 if not os.path.exists('logs/figures'):
-    os.makedirs('logs/figures')
-    os.makedirs('logs/figures/8M')
-    os.makedirs('logs/figures/35M')
-    os.makedirs('logs/figures/150M')
-    os.makedirs('logs/figures/650M')
+    os.makedirs('./logs/figures')
+    os.makedirs('./logs/figures/8M')
+    os.makedirs('./logs/figures/35M')
+    os.makedirs('./logs/figures/150M')
+    os.makedirs('./logs/figures/650M')
 
-if not os.path.exists(f'logs/version_{version}'):
-    os.makedirs(f'logs/version_{version}')
-    os.makedirs(f'logs/version_{version}/8M')
-    os.makedirs(f'logs/version_{version}/35M')
-    os.makedirs(f'logs/version_{version}/150M')
-    os.makedirs(f'logs/version_{version}/650M')
+if not os.path.exists(f'./logs/version_{version}'):
+    os.makedirs(f'./logs/version_{version}')
+    os.makedirs(f'./logs/version_{version}/8M')
+    os.makedirs(f'./logs/version_{version}/35M')
+    os.makedirs(f'./logs/version_{version}/150M')
+    os.makedirs(f'./logs/version_{version}/650M')
 
 # load ensemble of reward models
 reward_models = []
@@ -88,7 +88,7 @@ for i in range(num_reward_models):
     reward_models.append(reward_model)
 
 for huggingface_identifier in esm2_models:
-    dir_filepath = f'logs/PPO_{huggingface_identifier}' # ! update
+    dir_filepath = f'./logs/PPO_{huggingface_identifier}' # ! update
     model_size = huggingface_identifier.split('_')[2]
 
     # Load mutants from pretrained ESM2 650M, sft, and aligned models
@@ -125,12 +125,12 @@ for huggingface_identifier in esm2_models:
     plt.tight_layout()
 
     # Save the plot
-    plt.savefig(f'logs/figures/{model_size}/ppo_sft_pretrained_esm2_design_scores.svg')
-    plt.savefig(f'logs/figures/{model_size}/ppo_sft_pretrained_esm2_design_scores.png')
+    plt.savefig(f'./logs/figures/{model_size}/ppo_sft_pretrained_esm2_design_scores.svg')
+    plt.savefig(f'./logs/figures/{model_size}/ppo_sft_pretrained_esm2_design_scores.png')
 
     # Load the data
-    ema_filepath = f"logs/version_{version}/PPO_{huggingface_identifier}/ema_aligned_{huggingface_identifier}_mutated_designs_scores_ep{ep}.csv"
-    fixed_filepath = f"logs/version_{version}/PPO_{huggingface_identifier}/version_{version}/{huggingface_identifier}_fixed_mutated_designs_scores.csv"
+    ema_filepath = f"./logs/PPO_{huggingface_identifier}/version_{version}/ema_aligned_{huggingface_identifier}_mutated_designs_scores_ep{ep}.csv"
+    fixed_filepath = f"./logs/PPO_{huggingface_identifier}/version_{version}/{huggingface_identifier}_fixed_mutated_designs_scores.csv"
 
     ema_df = pd.read_csv(ema_filepath)[["Sequence"]].head(30)
     ema_df["Model"] = f"Aligned_ESM2_{model_size}"
@@ -247,8 +247,8 @@ for huggingface_identifier in esm2_models:
     ax.set_xticklabels(list(WT))
     ax.xaxis.set_ticks_position('top')
     ax.tick_params(axis='x', labeltop=True, labelbottom=False)
-    plt.savefig(f'logs/figures/{model_size}/Shannon_Entropy_All_Models.svg')
-    plt.savefig(f'logs/figures/{model_size}/Shannon_Entropy_All_Models.png')
+    plt.savefig(f'./logs/figures/{model_size}/Shannon_Entropy_All_Models.svg')
+    plt.savefig(f'./logs/figures/{model_size}/Shannon_Entropy_All_Models.png')
 
     # Provided mutation frequency data
     mutation_data = {'Aligned_ESM2': mutation_df.iloc[0], 'Pre_trained_ESM2': mutation_df.iloc[1]}
@@ -323,7 +323,7 @@ for huggingface_identifier in esm2_models:
         color_map = LinearSegmentedColormap.from_list("mutation_scale", [base_grey, target_red])
         create_color_scale_svg(color_map, f"logs/figures/{model_size}/color_scale_{model}.svg")
 
-        script_filename = f"logs/figures/{model_size}/color_{WT_name}_{model}.pml"
+        script_filename = f"./logs/figures/{model_size}/color_{WT_name}_{model}.pml"
         with open(script_filename, "w") as file:
             file.write(pymol_script)
 
@@ -505,6 +505,6 @@ for huggingface_identifier in esm2_models:
     ax2.legend(fontsize=10)
 
     plt.tight_layout()
-    plt.savefig(f'logs/figures/{model_size}/mutational_extrapolation_vs_pretrained.svg')
-    plt.savefig(f'logs/figures/{model_size}/mutational_extrapolation_vs_pretrained.png')
+    plt.savefig(f'./logs/figures/{model_size}/mutational_extrapolation_vs_pretrained.svg')
+    plt.savefig(f'./logs/figures/{model_size}/mutational_extrapolation_vs_pretrained.png')
     plt.show()
