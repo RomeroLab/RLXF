@@ -323,17 +323,17 @@ for huggingface_identifier in esm2_models:
         if (a == 0 and p == 0) or (a == p):
             color = base_grey
 
-        if a >= p:
+        elif a > p:
             scaled = 1 - (1 - a)**2
             color = [
-                base + (aligned_red[i] - base) * scaled
-                for base, aligned_red[i] in zip(base_grey, aligned_red)
+                base + (target - base) * scaled
+                for base, target in zip(base_grey, aligned_red)
             ]
         else:
             scaled = 1 - (1 - p)**2
             color = [
-                base + (pretrain_blue[i] - base) * scaled
-                for base, pretrain_blue[i] in zip(base_grey, pretrain_blue)
+                base + (target - base) * scaled
+                for base, target in zip(base_grey, pretrain_blue)
             ]
 
         overlay_script += (
