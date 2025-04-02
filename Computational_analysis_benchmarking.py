@@ -104,7 +104,7 @@ for huggingface_identifier in esm2_models:
         with torch.no_grad():
             score = reward_model.predict(WT)[0][0]  # Assuming predict returns a nested list/array
             scores.append(score)
-    predicted_wt_score = np.median(np.array(scores, dtype=np.float32))
+    predicted_wt_score = np.median(np.array(scores.cpu(), dtype=np.float32))
 
     # Plot histogram
     fig, ax = plt.subplots(figsize=(6, 6))
