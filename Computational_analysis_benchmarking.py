@@ -70,13 +70,6 @@ if not os.path.exists('logs/figures'):
     os.makedirs('./logs/figures/150M')
     os.makedirs('./logs/figures/650M')
 
-if not os.path.exists(f'./logs/version_{version}'):
-    os.makedirs(f'./logs/version_{version}')
-    os.makedirs(f'./logs/version_{version}/8M')
-    os.makedirs(f'./logs/version_{version}/35M')
-    os.makedirs(f'./logs/version_{version}/150M')
-    os.makedirs(f'./logs/version_{version}/650M')
-
 # load ensemble of reward models
 reward_models = []
 for i in range(num_reward_models):
@@ -114,32 +107,26 @@ for huggingface_identifier in esm2_models:
     sns.kdeplot(np.median(fixed_scores_np, axis=0), color='#bdbdbd', ax=ax, linewidth=2.5, fill=True, alpha=alpha, label=f'Pre-trained ESM2 ({model_size})')
     sns.kdeplot(np.median(sft_scores_np, axis=0), color='#92c5de', ax=ax, linewidth=2.5, fill=True, alpha=alpha, label=f'SFT ESM2 ({model_size})')
     sns.kdeplot(np.median(rl_scores_np, axis=0), color='#2166ac', ax=ax, linewidth=2.5, fill=True, alpha=alpha, label=f'Aligned ESM2 ({model_size})')
-
     ax.axvline(predicted_wt_score, color='black', linestyle='--', linewidth=1, label=f'Predicted {WT_name} score')
-
     ax.set_xlabel('Predicted Fluorescence', fontsize=12)
     ax.set_ylabel('Density', fontsize=14)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.legend()
     plt.tight_layout()
-
-    # Save the plot
     plt.savefig(f'./logs/figures/{model_size}/ppo_sft_pretrained_esm2_design_scores.svg')
     plt.savefig(f'./logs/figures/{model_size}/ppo_sft_pretrained_esm2_design_scores.png')
 
     # Load the data
     ema_filepath = f"./logs/PPO_{huggingface_identifier}/version_{version}/ema_aligned_{huggingface_identifier}_mutated_designs_scores_ep{ep}.csv"
     fixed_filepath = f"./logs/PPO_{huggingface_identifier}/version_{version}/{huggingface_identifier}_fixed_mutated_designs_scores.csv"
-
     ema_df = pd.read_csv(ema_filepath)[["Sequence"]].head(30)
     ema_df["Model"] = f"Aligned_ESM2_{model_size}"
     fixed_df = pd.read_csv(fixed_filepath)[["Sequence"]].head(30)
     fixed_df['Model'] = f"Pretrained_ESM2_{model_size}"
-
     df = pd.concat([ema_df, fixed_df], ignore_index=True)
     df = df.rename(columns={'Sequence': 'AA_sequence'})
-    df.head()
+    # df.head()
 
     # Initialize a dictionary to store mutation counts for each model
     mutation_counts = {model: np.zeros(slen) for model in df['Model'].unique()}
@@ -174,8 +161,6 @@ for huggingface_identifier in esm2_models:
     # Plot the heatmap
     sns.heatmap(mutation_difference_df.T, cmap=custom_cmap_1, vmin=min_score_1, vmax=max_score_1, square=True, cbar=True, 
                 yticklabels=mutation_difference_df.T.index, ax=ax, linewidths=0.5, linecolor='black')
-
-    # Set the x-axis labels (representing WT)
     ax.set_xticks(np.arange(mutation_df.shape[1]) + 0.5)
     ax.set_xticklabels(list(WT))
     ax.xaxis.set_ticks_position('top')
@@ -199,14 +184,10 @@ for huggingface_identifier in esm2_models:
 
     # Load the dataset
     designs_df = df
-
-    # List of models
     models = designs_df['Model'].unique()
 
-    # Dictionary to store entropies for each model
-    entropy_dict = {}
-
     # Calculate entropies for each model and store in the dictionary
+    entropy_dict = {}
     for model in models:
         # Filter sequences by model
         seq_list = designs_df[designs_df['Model'] == model]['AA_sequence'].tolist()
@@ -367,7 +348,7 @@ for huggingface_identifier in esm2_models:
             print("Status: finished generating sequences with ESM2")
 
             # Save mutants from ESM2
-            base_path = f'{filepath}/version_{version}/{model_size}/'
+            base_path = f'{filepath}/figures/{model_size}/'
             np.save(base_path + f'fixed_scores_HCthreshold_HC{high_conf_threshold}_CP{cum_prob_threshold}_{num_muts}muts.npy', fixed_scores_np)
             with open(base_path + f'fixed_mutated_seqs_HCthreshold_HC{high_conf_threshold}_CP{cum_prob_threshold}_{num_muts}muts.txt', 'w') as file:
                 for seq in fixed_mutated_seqs:
@@ -378,7 +359,7 @@ for huggingface_identifier in esm2_models:
         ################################################################################################################
 
         if generate_sft_designs:
-            model_identifier = f"sft_{model_identifier}"
+            model_identifier = f"sft_{huggingface_identifier}"
             sft_ESM2 = AutoModelForMaskedLM.from_pretrained(f"facebook/{huggingface_identifier}")
             state_dict = torch.load(f'{sft_model_filepath}/{sft_model_name}.pt', map_location=torch.device('cpu'))
             sft_ESM2.load_state_dict(state_dict)
@@ -388,7 +369,7 @@ for huggingface_identifier in esm2_models:
             print("Status: finished generating sequences with sft ESM2")
 
             # Save mutants from ESM2
-            base_path = f'{filepath}/version_{version}/{model_size}/'
+            base_path = f'{filepath}/figures/{model_size}/'
             np.save(base_path + f'sft_scores_HCthreshold_HC{high_conf_threshold}_CP{cum_prob_threshold}_{num_muts}muts.npy', sft_scores_np)
             with open(base_path + f'sft_mutated_seqs_HCthreshold_HC{high_conf_threshold}_CP{cum_prob_threshold}_{num_muts}muts.txt', 'w') as file:
                 for seq in sft_mutated_seqs:
@@ -400,7 +381,7 @@ for huggingface_identifier in esm2_models:
         ################################################################################################################
 
         if generate_aligned_designs:
-            model_identifier = f"aligned_{model_identifier}"
+            model_identifier = f"aligned_{huggingface_identifier}"
             rl_ESM2 = AutoModelForMaskedLM.from_pretrained(f"facebook/{huggingface_identifier}")
             state_dict = torch.load(f'{rl_model_filepath}/{rl_model_name}.pt', map_location=torch.device('cpu'))
             rl_ESM2.load_state_dict(state_dict)
@@ -410,7 +391,7 @@ for huggingface_identifier in esm2_models:
             print("Status: finished generating sequences with aligned ESM2")
 
             # Save mutants from ESM2
-            base_path = f'{filepath}/version_{version}/{model_size}/'
+            base_path = f'{filepath}/figures/{model_size}/'
             np.save(base_path + f'rl_scores_HCthreshold_HC{high_conf_threshold}_CP{cum_prob_threshold}_{num_muts}muts.npy', rl_scores_np)
             with open(base_path + f'rl_mutated_seqs_HCthreshold_HC{high_conf_threshold}_CP{cum_prob_threshold}_{num_muts}muts.txt', 'w') as file:
                 for seq in rl_mutated_seqs:
@@ -425,7 +406,7 @@ for huggingface_identifier in esm2_models:
     # Generate mutational extrapolation plot
     model_prefixes = ['fixed_', 'sft_', 'rl_']
     model_labels = {'fixed_': 'Pre-trained', 'sft_': 'SFT', 'rl_': 'PPO'}
-    dir_filepath = f'./logs/version_{version}/{model_size}'
+    dir_filepath = f'./logs/figures/{model_size}'
 
     # Initialize dictionary to store score lists for each model prefix
     score_dict = {prefix: [] for prefix in model_prefixes}
@@ -505,6 +486,6 @@ for huggingface_identifier in esm2_models:
     ax2.legend(fontsize=10)
 
     plt.tight_layout()
-    plt.savefig(f'./logs/figures/{model_size}/mutational_extrapolation_vs_pretrained.svg')
-    plt.savefig(f'./logs/figures/{model_size}/mutational_extrapolation_vs_pretrained.png')
+    plt.savefig(f'{dir_filepath}/mutational_extrapolation_vs_pretrained.svg')
+    plt.savefig(f'{dir_filepath}/mutational_extrapolation_vs_pretrained.png')
     plt.show()
