@@ -349,13 +349,13 @@ for huggingface_identifier in esm2_models:
         generate_pretrained_designs = True
         generate_sft_designs = True
         sft_model_exists = True
-        sft_model_filepath = f'./logs/version_{sft_version}' # ! update
+        sft_model_filepath = f'{filepath}/SFT_{huggingface_identifier}/version_{sft_version}' # ! update
         sft_model_name = f'SFT_{huggingface_identifier}_v0' # ! update
 
         # Generate designs from aligned model
         generate_aligned_designs = True
         rl_model_exists = True
-        rl_model_filepath = f'{filepath}/SFT_{huggingface_identifier}/version_{version}' # ! update
+        rl_model_filepath = f'{filepath}/PPO_{huggingface_identifier}/version_{version}' # ! update
         rl_model_name = f'ema_aligned_{huggingface_identifier}_v{version}_ep{ep}' # ! update
 
         ################################################################################################################
