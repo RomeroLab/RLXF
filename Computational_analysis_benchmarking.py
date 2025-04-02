@@ -35,6 +35,7 @@ from optuna.exceptions import TrialPruned
 from pytorch_lightning.callbacks import Callback
 from matplotlib.colors import LinearSegmentedColormap
 import scipy
+import shutil
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 torch.set_num_threads(20)
@@ -53,7 +54,7 @@ slen = len(WT)
 
 # generating designs
 num_designs = 50
-num_muts_list = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+num_muts_list = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 high_conf_threshold = 0.9
 cum_prob_threshold = 0.25
 seed = 7028
@@ -231,10 +232,6 @@ for huggingface_identifier in esm2_models:
     plt.savefig(f'./logs/figures/{model_size}/Shannon_Entropy_All_Models.svg')
     plt.savefig(f'./logs/figures/{model_size}/Shannon_Entropy_All_Models.png')
 
-    # Provided mutation frequency data
-    mutation_data = {'Aligned_ESM2': mutation_df.iloc[0], 'Pre_trained_ESM2': mutation_df.iloc[1]}
-    mutation_data
-
     def hex_to_rgb(hex_str):
         """Convert a hex color string to a list of normalized RGB values."""
         hex_str = hex_str.lstrip('#')
@@ -251,6 +248,9 @@ for huggingface_identifier in esm2_models:
         plt.savefig(filename, format='svg')
         plt.close()
 
+    # Provided mutation frequency data
+    mutation_data = {'Aligned_ESM2': mutation_df.iloc[0], 'Pre_trained_ESM2': mutation_df.iloc[1]}
+
     # Define colors as normalized RGB lists
     base_grey = hex_to_rgb('#f0f0f0')  # Base color for no mutation
     target_red = hex_to_rgb('#ef3b2c')  # Adjusted target red for high mutation
@@ -258,7 +258,7 @@ for huggingface_identifier in esm2_models:
 
     # Normalize the mutation frequencies for each model
     normalized_data = {model: mutations / np.max(mutations) for model, mutations in mutation_data.items()}
-    print(normalized_data)
+    # print(normalized_data)
 
     # Generate separate PyMOL scripts for each model
     for model, normalized_mutations in normalized_data.items():
@@ -309,6 +309,59 @@ for huggingface_identifier in esm2_models:
             file.write(pymol_script)
 
         print(f"PyMOL script saved as '{script_filename}'.")
+
+    # ---------- Overlay Script for Aligned_ESM2 vs Pre_trained_ESM2 ----------
+    overlay_script = f"load {WT_name}_AF3.pdb, {WT_name}_AF3\n"
+
+    aligned = normalized_data['Aligned_ESM2']
+    pretrain = normalized_data['Pre_trained_ESM2']
+
+    for i, (a, p) in enumerate(zip(aligned, pretrain)):
+        if a == 0 and p == 0:
+            continue  # skip unmutated
+
+        if a >= p:
+            scaled = 1 - (1 - a)**2
+            color = [
+                base + (aligned_red[i] - base) * scaled
+                for base, aligned_red[i] in zip(base_grey, aligned_red)
+            ]
+        else:
+            scaled = 1 - (1 - p)**2
+            color = [
+                base + (pretrain_blue[i] - base) * scaled
+                for base, pretrain_blue[i] in zip(base_grey, pretrain_blue)
+            ]
+
+        overlay_script += (
+            f"set_color overlay_{WT_name}_AF3_{i}, "
+            f"[{color[0]:.3f}, {color[1]:.3f}, {color[2]:.3f}]\n"
+            f"color overlay_{WT_name}_AF3_{i}, /{WT_name}_AF3//A/{i+1}\n"
+        )
+
+    overlay_script += (
+        f"set_color fad_color, [{fad_blue[0]:.3f}, {fad_blue[1]:.3f}, {fad_blue[2]:.3f}]\n"
+        "color fad_color, resn FAD\n"
+        "set_view (\
+        0.980802536,    0.071432516,   -0.181449398,\
+        0.075355798,   -0.997043610,    0.014813880,\
+        -0.179854885,   -0.028202031,   -0.983288884,\
+        0.000000000,    0.000000000, -169.733245850,\
+        2.112551689,   -1.722059250,   -1.260961533,\
+        133.818984985,  205.647506714,  -20.000000000 )\n"
+        "set ray_opaque_background, off\nset specular, 0\nset ray_trace_fog, 0\nray\n"
+        f"png ray_color_{WT_name}_overlay.png, dpi=300\n"
+    )
+
+    overlay_filename = f"./logs/figures/{model_size}/color_{WT_name}_overlay.pml"
+    with open(overlay_filename, "w") as f:
+        f.write(overlay_script)
+
+    # Copy the PDB file
+    shutil.copyfile(f"{WT_name}_AF3.pdb", f'./logs/figures/{model_size}/{WT_name}_AF3.pdb')
+
+    print(f"Overlay PyMOL script saved as '{overlay_filename}'.")
+    print(f"PDB file copied to '{overlay_dir}/{WT_name}_AF3.pdb'.")
 
     ################################################################################################################
     # Define amino acid dictionary for tokenization, define WT for length of context window
