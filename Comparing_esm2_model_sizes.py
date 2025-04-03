@@ -194,8 +194,8 @@ max_values = df_scores.groupby(["Model", "Condition"])["Score"].max().reset_inde
 for _, row in max_values.iterrows():
     i = model_identifiers.index(row["Model"])
     x_pos = i + offset_dict[row["Condition"]]
-    ax1.text(x_pos, np.maximum(row["Score"] + y_offset, 4.165), f"Max:\n{row['Score']:.3f}",
-             ha='center', va='bottom', fontsize=10, color='black', zorder=11)
+    # ax1.text(x_pos, np.maximum(row["Score"] + y_offset, predicted_wt_score + 1), f"Max:\n{row['Score']:.3f}",
+    #          ha='center', va='bottom', fontsize=10, color='black', zorder=11)
 
 # Build custom legend combining scatter points and a mean indicator.
 scatter_handles_list = [scatter_handles[cond] for cond in conditions if scatter_handles[cond] is not None]
@@ -241,10 +241,10 @@ for model in model_identifiers:
 ax2.axhline(50, color='gray', linestyle='--', lw=linewidth, label='Tie')
 ax2.text(0.85, 0.05, f"n = {n_win_rate}", transform=ax2.transAxes, fontsize=10, color='black', va='bottom')
 ax2.set_xticks(list(cond_map.values()))
-ax2.set_xticklabels(conditions, fontsize=8)
+ax2.set_xticklabels(conditions, fontsize=12)
 ax2.set_xlabel("Training Condition", fontsize=12)
 ax2.set_ylabel("Win Rate (%)", fontsize=12)
-ax2.set_ylim(0, 100)
+ax2.set_ylim(40, 100)
 ax2.legend(title="Model", loc="upper center", bbox_to_anchor=(0.5, -0.15),
            ncol=3, fontsize=10, title_fontsize=12)
 plt.tight_layout(rect=[0, 0, 1, 1])
