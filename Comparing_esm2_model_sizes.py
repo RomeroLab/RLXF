@@ -256,8 +256,8 @@ ax2.legend(title="Model", loc="upper center", bbox_to_anchor=(0.5, -0.15),
            ncol=3, fontsize=10, title_fontsize=12)
 
 plt.tight_layout(rect=[0, 0, 1, 1])
-plt.savefig('./log/figures/esm2_models_and_designs.svg')
-plt.savefig('./log/figures/esm2_models_and_designs.png')
+plt.savefig('./logs/figures/esm2_models_and_designs.svg')
+plt.savefig('./logs/figures/esm2_models_and_designs.png')
 plt.show()
 
 
