@@ -48,6 +48,7 @@ rl_version = 8
 sft_version = 0
 ep = 5
 WT_linewidth = 2
+linewidth = 1
 
 # load ensemble of reward models
 reward_models = []
