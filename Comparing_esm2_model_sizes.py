@@ -26,10 +26,6 @@ import matplotlib.patches as mpatches
 from sklearn import metrics
 import os
 import pickle
-from functions import (identify_mutations_and_count, generate_df, generate_and_evaluate_mutants, generate_and_evaluate_mutants_max_sampling,
-    mutate_sequences_after_training, mutate_sequences_after_training_esm2_max_sampling, get_sft_version_file)
-from dataloading_RLXF_ESM2 import (ProtDataModuleESM2, ProtRepDatasetESM2)
-from PPO_ESM2_650M_with_model_saving_DDP import RLXF_PPO_ESM2
 from transformers import AutoModelForMaskedLM, AutoTokenizer
 from MLP import MLP
 import itertools
@@ -38,8 +34,6 @@ import warnings
 import optuna
 import logging
 import sys
-from optuna.exceptions import TrialPruned
-from pytorch_lightning.callbacks import Callback
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 
