@@ -100,9 +100,9 @@ for huggingface_identifier in esm2_models:
             scores.append(score)
     predicted_wt_score = np.median(np.array(scores, dtype=np.float32))
 
-    # # Plot histogram
-    # fig, ax = plt.subplots(figsize=(6, 6))
-    # alpha = 0.5
+    # Plot histogram
+    fig, ax = plt.subplots(figsize=(6, 6))
+    alpha = 0.5
 
     # # Plot histograms for the models7
     # sns.kdeplot(np.median(fixed_scores_np, axis=0), color='#bdbdbd', ax=ax, linewidth=2.5, fill=True, alpha=alpha, label=f'Pre-trained ESM2 ({model_size})', common_norm=True)
