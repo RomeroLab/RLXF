@@ -100,17 +100,44 @@ for huggingface_identifier in esm2_models:
             scores.append(score)
     predicted_wt_score = np.median(np.array(scores, dtype=np.float32))
 
-    # Plot histogram
-    fig, ax = plt.subplots(figsize=(6, 6))
-    alpha = 0.5
+    # # Plot histogram
+    # fig, ax = plt.subplots(figsize=(6, 6))
+    # alpha = 0.5
 
-    # Plot histograms for the models7
-    sns.kdeplot(np.median(fixed_scores_np, axis=0), color='#bdbdbd', ax=ax, linewidth=2.5, fill=True, alpha=alpha, label=f'Pre-trained ESM2 ({model_size})', common_norm=True)
-    sns.kdeplot(np.median(sft_scores_np, axis=0), color='#92c5de', ax=ax, linewidth=2.5, fill=True, alpha=alpha, label=f'SFT ESM2 ({model_size})', common_norm=True)
-    sns.kdeplot(np.median(rl_scores_np, axis=0), color='#2166ac', ax=ax, linewidth=2.5, fill=True, alpha=alpha, label=f'Aligned ESM2 ({model_size})', common_norm=True)
+    # # Plot histograms for the models7
+    # sns.kdeplot(np.median(fixed_scores_np, axis=0), color='#bdbdbd', ax=ax, linewidth=2.5, fill=True, alpha=alpha, label=f'Pre-trained ESM2 ({model_size})', common_norm=True)
+    # sns.kdeplot(np.median(sft_scores_np, axis=0), color='#92c5de', ax=ax, linewidth=2.5, fill=True, alpha=alpha, label=f'SFT ESM2 ({model_size})', common_norm=True)
+    # sns.kdeplot(np.median(rl_scores_np, axis=0), color='#2166ac', ax=ax, linewidth=2.5, fill=True, alpha=alpha, label=f'Aligned ESM2 ({model_size})', common_norm=True)
+    # ax.axvline(predicted_wt_score, color='black', linestyle='--', linewidth=1, label=f'Predicted {WT_name} score')
+    # ax.set_xlabel('Predicted Fluorescence', fontsize=12)
+    # ax.set_ylabel('Density', fontsize=14)
+    # ax.spines['top'].set_visible(False)
+    # ax.spines['right'].set_visible(False)
+    # ax.legend()
+    # plt.tight_layout()
+    # plt.savefig(f'./logs/figures/{model_size}/ppo_sft_pretrained_esm2_design_scores.svg')
+    # plt.savefig(f'./logs/figures/{model_size}/ppo_sft_pretrained_esm2_design_scores.png')
+
+    from scipy.stats import gaussian_kde
+
+    def plot_kde_rescaled(data, color, label, ax, alpha):
+        kde = gaussian_kde(data)
+        x = np.linspace(np.min(data), np.max(data), 1000)
+        y = kde(x)
+        y /= np.max(y)  # Rescale so peak = 1
+        ax.plot(x, y, color=color, linewidth=2.5, label=label)
+        ax.fill_between(x, y, color=color, alpha=alpha)
+
+    # Plot each model's KDE
+    plot_kde_rescaled(np.median(fixed_scores_np, axis=0), '#bdbdbd', f'Pre-trained ESM2 ({model_size})', ax, alpha)
+    plot_kde_rescaled(np.median(sft_scores_np, axis=0), '#92c5de', f'SFT ESM2 ({model_size})', ax, alpha)
+    plot_kde_rescaled(np.median(rl_scores_np, axis=0), '#2166ac', f'Aligned ESM2 ({model_size})', ax, alpha)
+
+    # Final plot adjustments
     ax.axvline(predicted_wt_score, color='black', linestyle='--', linewidth=1, label=f'Predicted {WT_name} score')
     ax.set_xlabel('Predicted Fluorescence', fontsize=12)
-    ax.set_ylabel('Density', fontsize=14)
+    ax.set_ylabel('Normalized Density', fontsize=14)
+    ax.set_ylim(0, 1)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.legend()
