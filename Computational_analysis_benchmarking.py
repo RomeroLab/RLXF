@@ -122,11 +122,14 @@ for huggingface_identifier in esm2_models:
 
     def plot_kde_rescaled(data, color, label, ax, alpha):
         kde = gaussian_kde(data)
-        x = np.linspace(np.min(data), np.max(data), 1000)
+        x_min, x_max = np.min(data), np.max(data)
+        buffer = (x_max - x_min) * 0.05  # extend by 5% on each side
+        x = np.linspace(x_min - buffer, x_max + buffer, 1000)
         y = kde(x)
-        y /= np.max(y)  # Rescale so peak = 1
+        y /= np.max(y)
         ax.plot(x, y, color=color, linewidth=2.5, label=label)
         ax.fill_between(x, y, color=color, alpha=alpha)
+
 
     # Plot each model's KDE
     plot_kde_rescaled(np.median(fixed_scores_np, axis=0), '#bdbdbd', f'Pre-trained ESM2 ({model_size})', ax, alpha)
