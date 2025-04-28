@@ -250,7 +250,7 @@ matrix_data = [np.load(os.path.join(output_dir, fname)).reshape(-1) for fname in
 matrix_shape = np.load(os.path.join(output_dir, matrix_filenames[0])).shape
 
 # Identify target
-target_name = 'Pretrained_single_mut_heatmap.npy'
+target_name = 'single_mutant_function_predictions.npy'
 target_idx = matrix_filenames.index(target_name)
 y = matrix_data[target_idx]
 
