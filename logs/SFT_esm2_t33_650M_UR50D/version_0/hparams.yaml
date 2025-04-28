@@ -1,0 +1,14 @@
+WD: 0.003506385543831778
+WT: IEKFKLLAEKVEEIVAKNARAEIDYSDAPDEFRDPLMDTLMTDPVRLPSGTVMDRSIILRHLLNSPTDPFNRQMLTESMLEPVPELKEQIQAWMREKQSSDH
+batch_size: 8
+epochs: 1
+grad_clip_threshold: 3
+learning_rate: 0.0051114990195524
+lr_mult: 0.8897135219977205
+lr_mult_factor: 1.5704059582871683
+max_num_layers_unfreeze_each_epoch: 82
+model_identifier: esm2_t33_650M_UR50D
+num_layers_unfreeze_each_epoch: 1
+num_unfrozen_layers: 25
+random_masking: 0
+seed: 42
