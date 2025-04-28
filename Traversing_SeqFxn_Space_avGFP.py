@@ -182,7 +182,7 @@ wt_scores = []
 with torch.no_grad():
     for model in models:
         model.eval()  # Set model to evaluation mode
-        pred_Y = model.predict(seq).cpu().numpy().astype(float)  # Predict Label Scores
+        pred_Y = model.predict(WT).cpu().numpy().astype(float)  # Predict Label Scores
         wt_scores.append(pred_Y)  # Append label scores for each enzyme from all models
 WT_score = np.quantile(labels, q=0.05, axis=0)[0]
 print('scored WT', WT_score)
@@ -195,13 +195,12 @@ for pos in range(sequence_length):
 
         mutant_seq = list(WT)
         mutant_seq[pos] = aa
-        ind_seq = torch.tensor(aa2ind(mutant_seq))
 
         scores = []
         with torch.no_grad():
             for model in models:
                 model.eval()  # Redundant but very safe
-                score = model.predict(ind_seq).cpu().numpy().astype(float)  # Safe conversion
+                score = model.predict(mutant_seq).cpu().numpy().astype(float)  # Safe conversion
                 scores.append(score)
 
         functional_score = np.quantile(scores, q=0.05, axis=0)[0]
