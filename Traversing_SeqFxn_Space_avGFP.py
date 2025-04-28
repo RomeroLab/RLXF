@@ -122,6 +122,7 @@ def get_single_mut_log_probs(model, sequence):
             logits = outputs.logits[:, :, esm2_token_start:esm2_token_end]
             log_probs = F.log_softmax(logits[0, mask_pos + 1], dim=-1)
             new_log_states[mask_pos] = log_probs
+            print('calculated log_probs')
 
     return new_log_states
 
@@ -155,13 +156,13 @@ def plot_heatmap(log_probabilities, model_name):
     plt.savefig(os.path.join(output_dir, f'{model_name}_single_mut_heatmap.svg'))
     np.save(f'./logs/figures/{model_name}_single_mut_heatmap.npy', probs.cpu().detach().numpy())
     plt.close()
+    print('saved npy matrix')
 
 for model_name, model in models.items():
     print(f"Processing model: {model_name}")
     log_probs = get_single_mut_log_probs(model, WT)
     plot_heatmap(log_probs, model_name)
-
-print("finished generating single mutation maps")
+    print("finished generating single mutation maps")
 
 ####################################### Create SM probability maps from reward model predictions ########################################
 
