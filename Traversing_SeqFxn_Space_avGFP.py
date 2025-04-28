@@ -250,7 +250,7 @@ matrix_data = [np.load(os.path.join(output_dir, fname)).reshape(-1) for fname in
 matrix_shape = np.load(os.path.join(output_dir, matrix_filenames[0])).shape
 
 # Identify target
-target_name = 'single_mutant_function_predictions.npy'
+target_name = 'PPO_single_mut_heatmap.npy'
 target_idx = matrix_filenames.index(target_name)
 y = matrix_data[target_idx]
 
@@ -299,7 +299,7 @@ colors = plt.cm.plasma(np.linspace(0, 1, len(labels)))
 plt.figure(figsize=(6, 6))
 for i, label in enumerate(labels):
     plt.scatter(X[i, 0], X[i, 1], color=colors[i], s=50)
-    plt.text(X[i, 0] + 0.3, X[i, 1], label, fontsize=8)
+    plt.text(X[i, 0], X[i, 1], label, fontsize=8)
 
 plt.xlabel("MDS dimension 1")
 plt.ylabel("MDS dimension 2")
