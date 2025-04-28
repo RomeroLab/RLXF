@@ -174,13 +174,12 @@ torch.cuda.empty_cache()
 # Load models
 models = []
 for i in range(num_models):
-    model = MLP(learning_rate=1e-6, batch_size=128, epochs=2000, slen=sequence_length)
-    model_path = f'./reward_models/reward_model_v{i}.ckpt'
-    checkpoint = torch.load(model_path, map_location='cpu')
-    model.load_state_dict(checkpoint['state_dict'])
-    model.eval()
-    models.append(model)
-    print('loaded reward model')
+    model_name = f"reward_model_v{i}.ckpt"
+    checkpoint_path = f"./reward_models/{model_name}"
+    reward_model = MLP.load_from_checkpoint(checkpoint_path)
+    for param in reward_model.parameters():
+        param.requires_grad = False
+    models.append(reward_model)
 
 # Score the WT sequence as a whole
 WT_tensor = torch.tensor(aa2ind(list(WT)))
