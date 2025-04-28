@@ -153,8 +153,7 @@ def plot_heatmap(probabilities, model_name):
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, f'{model_name}_single_mut_heatmap.png'), dpi=300)
     plt.savefig(os.path.join(output_dir, f'{model_name}_single_mut_heatmap.svg'))
-    np.save(f'./logs/figures/{model_name}_single_mut_heatmap.npy', 
-                       probabilities.detach().numpy())
+    np.save(f'./logs/figures/{model_name}_single_mut_heatmap.npy', probabilities.cpu().detach().numpy())
     plt.close()
 
 for model_name, model in models.items():
