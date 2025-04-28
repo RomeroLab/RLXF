@@ -184,7 +184,7 @@ with torch.no_grad():
         model.eval()  # Set model to evaluation mode
         pred_Y = model.predict(WT).cpu().numpy().astype(float)  # Predict Label Scores
         wt_scores.append(pred_Y)  # Append label scores for each enzyme from all models
-WT_score = np.quantile(labels, q=0.05, axis=0)[0]
+WT_score = np.quantile(wt_scores, q=0.05, axis=0)[0]
 print('scored WT', WT_score)
 
 # Step 2: Score all single mutants of WT
