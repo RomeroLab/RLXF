@@ -178,8 +178,7 @@ for i in range(num_models):
     print('loaded reward model')
 
 # Score the WT sequence as a whole
-WT_tensor = torch.tensor(aa2ind(list(WT)))
-wt_scores = [model.predict(WT_tensor).item() for model in models]
+wt_scores = [model.predict(WT).cpu().numpy().astype(float) for model in models]
 WT_score = np.percentile(wt_scores, 5)
 print('scored WT', WT_score)
 
