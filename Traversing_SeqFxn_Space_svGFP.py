@@ -160,7 +160,14 @@ for model_name, model in models.items():
     print(f"Processing model: {model_name}")
     log_probs = get_single_mut_log_probs(model, WT)
     plot_heatmap(log_probs, model_name)
-    
+
+# Delete ESM-2 models
+del pretrained_ESM2
+del sft_ESM2
+del ppo_ESM2
+
+# If they were loaded on GPU, also clear GPU memory
+torch.cuda.empty_cache()
 
 ####################################### Create SM probability maps from reward model predictions ########################################
 
