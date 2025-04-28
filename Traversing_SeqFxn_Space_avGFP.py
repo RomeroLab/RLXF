@@ -178,8 +178,13 @@ for i in range(num_models):
     print('loaded reward model')
 
 # Score the WT sequence as a whole
-wt_scores = [model.predict(WT).cpu().numpy().astype(float) for model in models]
-WT_score = np.percentile(wt_scores, 5)
+wt_scores = []
+with torch.no_grad():
+for model in models:
+    model.eval()  # Set model to evaluation mode
+    pred_Y = model.predict(seq).cpu().numpy().astype(float)  # Predict Label Scores
+    wt_scores.append(pred_Y)  # Append label scores for each enzyme from all models
+WT_score = np.quantile(labels, q=0.05, axis=0)[0]
 print('scored WT', WT_score)
 
 # Step 2: Score all single mutants of WT
@@ -194,10 +199,11 @@ for pos in range(sequence_length):
 
         scores = []
         for model in models:
-            score = model.predict(ind_seq).item()
+            model.eval()  # Redundant but very safe
+            score = model.predict(ind_seq).cpu().numpy().astype(float)  # Safe conversion
             scores.append(score)
 
-        functional_score = np.percentile(scores, 5)
+        functional_score = np.quantile(scores, q=0.05, axis=0)[0]
         heatmap_matrix[aa_idx, pos] = functional_score - WT_score
 
 # # Subtract WT score from all entries and normalize
