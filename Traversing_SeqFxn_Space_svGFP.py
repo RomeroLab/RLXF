@@ -10,7 +10,6 @@ import seaborn as sns
 from transformers import AutoTokenizer
 import pickle
 import os
-from MLP import ProtDataModule, SeqFcnDataset, MLP
 from torchtext import vocab # This package can give problems sometimes, it may be necessary to downgrade to a specific version
 from collections import OrderedDict
 import torch
@@ -19,6 +18,7 @@ from sklearn.manifold import MDS
 from scipy.special import softmax
 import torch.nn.functional as F
 from transformers import AutoModelForMaskedLM
+from MLP import (SeqFcnDataset, ProtDataModule, MLP)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
