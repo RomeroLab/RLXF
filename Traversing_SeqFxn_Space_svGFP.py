@@ -25,7 +25,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Plotting parameters
 WT_name = "avGFP"
-WT = 'MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTLSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK' # CreiLOV
+WT = 'MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTLSYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITHGMDELYK' # avGFP
 model_identifier ='esm2_t6_8M_UR50D' # 'esm2_t6_8M_UR50D', 'esm2_t12_35M_UR50D', 'esm2_t30_150M_UR50D', 'esm2_t33_650M_UR50D'
 num_models = 10
 ppo_version = 8
@@ -167,18 +167,19 @@ for model_name, model in models.items():
 # Load models
 models = []
 for i in range(num_models):
-    model = MLP(learning_rate=0.001, batch_size=32, epochs=50, slen=sequence_length)
+    model = MLP(learning_rate=1e-6, batch_size=128, epochs=2000, slen=sequence_length)
     model_path = f'./reward_models/reward_model_v{i}.ckpt'
     checkpoint = torch.load(model_path, map_location='cpu')
     model.load_state_dict(checkpoint['state_dict'])
     model.eval()
     models.append(model)
+    print('loaded reward model')
 
 # Score the WT sequence as a whole
 WT_tensor = torch.tensor(aa2ind(list(WT)))
 wt_scores = [model.predict(WT_tensor).item() for model in models]
 WT_score = np.percentile(wt_scores, 5)
-print(WT_score)
+print('scored WT', WT_score)
 
 # Step 2: Score all single mutants of WT
 heatmap_matrix = np.zeros((20, sequence_length))
