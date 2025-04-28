@@ -161,6 +161,8 @@ for model_name, model in models.items():
     log_probs = get_single_mut_log_probs(model, WT)
     plot_heatmap(log_probs, model_name)
 
+print("finished generating single mutation maps")
+
 # Delete ESM-2 models
 del pretrained_ESM2
 del sft_ESM2
@@ -180,6 +182,7 @@ for i in range(num_models):
     for param in reward_model.parameters():
         param.requires_grad = False
     models.append(reward_model)
+    print('loaded reward model')
 
 # Score the WT sequence as a whole
 WT_tensor = torch.tensor(aa2ind(list(WT)))
