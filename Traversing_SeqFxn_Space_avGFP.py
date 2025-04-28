@@ -47,7 +47,7 @@ output_dir = './logs/figures/'
 os.makedirs(output_dir, exist_ok=True)
 
 
-######################################## Create one-hot encoding of WT ########################################
+####################################### Create one-hot encoding of WT ########################################
 
 # Create empty 20 x L matrix
 wt_matrix = np.zeros((20, len(WT)))
@@ -126,8 +126,8 @@ def get_single_mut_log_probs(model, sequence):
     return new_log_states
 
 # Function to plot and save heatmap
-def plot_heatmap(probabilities, model_name):
-    probs = probabilities.exp().cpu().numpy()
+def plot_heatmap(log_probabilities, model_name):
+    probs = torch.exp(log_probabilities).to(torch.float32).cpu()
     all_tokens = list(tokenizer.get_vocab().keys())[4:24]
 
     plt.figure(figsize=(sequence_length // 3, 6))
@@ -153,7 +153,7 @@ def plot_heatmap(probabilities, model_name):
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, f'{model_name}_single_mut_heatmap.png'), dpi=300)
     plt.savefig(os.path.join(output_dir, f'{model_name}_single_mut_heatmap.svg'))
-    np.save(f'./logs/figures/{model_name}_single_mut_heatmap.npy', probabilities.cpu().detach().numpy())
+    np.save(f'./logs/figures/{model_name}_single_mut_heatmap.npy', probs.cpu().detach().numpy())
     plt.close()
 
 for model_name, model in models.items():
@@ -162,14 +162,6 @@ for model_name, model in models.items():
     plot_heatmap(log_probs, model_name)
 
 print("finished generating single mutation maps")
-
-# Delete ESM-2 models
-del pretrained_ESM2
-del sft_ESM2
-del ppo_ESM2
-
-# If they were loaded on GPU, also clear GPU memory
-torch.cuda.empty_cache()
 
 ####################################### Create SM probability maps from reward model predictions ########################################
 
