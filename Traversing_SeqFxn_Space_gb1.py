@@ -129,10 +129,15 @@ def get_single_mut_log_probs(model, sequence):
 # Function to plot and save heatmap
 def plot_heatmap(log_probabilities, model_name):
     probs = torch.exp(log_probabilities).to(torch.float32).cpu()
-    all_tokens = list(tokenizer.get_vocab().keys())[4:24]
+    all_tokens = list(tokenizer.get_vocab().keys())[4:24] # ESM2 amino acid tokens
+    esm2_to_AAs_row_order = [all_tokens.index(aa) for aa in AAs]
+
+    matrix = probs.T
+    reordered_matrix = matrix[esm2_to_AAs_row_order, :]
+
 
     plt.figure(figsize=(sequence_length // 3, 6))
-    sns.heatmap(probs.T, cmap=cmap, square=True, linewidths=0.003, linecolor='0.7', vmin=0, vmax=1)
+    sns.heatmap(reordered_matrix, cmap=cmap, square=True, linewidths=0.003, linecolor='0.7', vmin=0, vmax=1)
 
     plt.xticks(np.arange(sequence_length) + 0.5, range(1, sequence_length + 1), fontsize=8, rotation=90)
     plt.yticks(np.arange(20) + 0.5, AAs, fontsize=10, rotation=0)
@@ -154,7 +159,7 @@ def plot_heatmap(log_probabilities, model_name):
     plt.tight_layout()
     plt.savefig(os.path.join(output_dir, f'{model_name}_single_mut_heatmap.png'), dpi=300)
     plt.savefig(os.path.join(output_dir, f'{model_name}_single_mut_heatmap.svg'))
-    np.save(f'./logs/figures/{model_name}_single_mut_heatmap.npy', probs.cpu().detach().numpy())
+    np.save(f'./logs/figures/{model_name}_single_mut_heatmap.npy', reordered_matrix.cpu().detach().numpy())
     plt.close()
     print('saved npy matrix')
 
