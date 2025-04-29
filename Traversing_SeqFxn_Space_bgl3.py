@@ -128,7 +128,6 @@ def get_single_mut_log_probs(model, sequence):
 
 # Function to plot and save heatmap
 def plot_heatmap(log_probabilities, model_name):
-    def plot_heatmap(log_probabilities, model_name):
     probs = torch.exp(log_probabilities).to(torch.float32).cpu()
     all_tokens = list(tokenizer.get_vocab().keys())[4:24] # ESM2 amino acid tokens
     esm2_to_AAs_row_order = [all_tokens.index(aa) for aa in AAs]
