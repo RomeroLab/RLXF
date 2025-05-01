@@ -1,0 +1,6 @@
+average_hamming_distance: 4.984375
+maximum_hamming_distance: 13
+mutation_diversity: 60
+position_diversity: 44
+number_of_unique_sequences: 64
+scale: 1.428813559322034
