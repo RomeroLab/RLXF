@@ -1,20 +1,25 @@
-# RLXF  
-Consolidated repository to perform RLXF.  
+# Reinforcement Learning from eXperimental Feedback (RLXF)  
+Reinforcement Learning from eXperimental Feedback (RLXF) is a framework for aligning the protein language model (pLM) **ESM-2**, and can be adapted for your pLM of choice, with experimentally derived notions of biomolecular function (Figure below). This enables the generative design of proteins with enhanced properties tailored to user-defined objectives. Our approach draws inspiration from the reinforcement learning techniques that aligned large language models with human preferences, resulting in transformative tools such as ChatGPT and Claude. In RLXF, a reward function, such as a supervised sequence-function predictor or any sequence scoring model, provides feedback to the pLM, guiding it to generate sequences with improved function. The outcome is a functionally aligned model that can be repeatedly sampled to produce diverse sequences optimized for the desired property.
 
+We applied RLXF across five diverse protein classes to demonstrate its generalizability and effectiveness at generating optimized sequences by learning functional constraints beyond those captured during pre-training. As an in-depth case study, we aligned the 650M parameter ESM-2 model to experimental fluorescence data from the CreiLOV flavin-binding fluorescent protein. The aligned model learned to prioritize mutations that enhance fluorescence, many of which were missed by the base model. Experimental validation revealed the RLXF-aligned model generates a higher fraction of functional sequences, a greater number of sequences more fluorescent than CreiLOV, and the brightest oxygen-independent fluorescent protein variant reported to date. We provide data from these studies in the directory **`paper_analysis`**.
+
+![Figure_1](https://github.com/user-attachments/assets/ebb952ce-137d-4af5-96da-d360a0d85370)
+
+## Performing RLXF
 Perform the following steps to functionally align the protein language model (pLM) **ESM-2**.
 
-## Key Terminology  
+### Key Terminology  
 - **SFT**: Supervised Fine-tuning  
 - **PPO**: Proximal Policy Optimization
 
-## Step 0: Pre-process Sequence-Function Dataset  
+### Step 0: Pre-process Sequence-Function Dataset  
 Ensure the sequence-function dataset file is correctly formatted before proceeding.
 - The dataset file should be named: **`SeqFxnDataset.pkl`**  
 - The column containing amino acid sequences must be named: **`sequence`**  
 - The column containing functional scores must be named: **`functional_score`**
 - The column listing mutations must be named: **`mutations`** with the following format: G3E,L4N (no spaces, use 1-indexing i.e. first amino acid is M1 not M0 for start codon)
 
-## Step 1: Train reward model
+### Step 1: Train reward model
 We train an ensemble of multi-layer perceptrons to predict the log fluoresence of CreiLOV variants in a DMS dataset. Our repository is setup to train on a sequence-function dataset file (SeqFxnDataset.pkl) with a sequence and functional_score column.
 
 ```python3 Training_Ensemble_of_reward_models.py > Training_Ensemble_of_reward_models.out```
@@ -29,7 +34,7 @@ Files generated:
   - **Test_Results.png**: plot of actual vs. predicted sequence function
   - **Test_Results.csv**: contains 'MSE', 'Pearson R', and 'Spearman's Rho' metrics for test set
 
-## Step 2: Generate synthetic sequence dataset for SFT via simulated annealing trials
+### Step 2: Generate synthetic sequence dataset for SFT via simulated annealing trials
 We generate a small, high quality synthetic sequence dataset via simulated annealing trials
 
 ```python3 simulated_annealing.py > simulated_annealing.out```
@@ -47,7 +52,7 @@ Files generated:
     - Optional: **close_sequences_{num_mut}mut_v{version}.pickle**: Use wt_functional_threshold to save sequences predicted to be have enhanced function relative to wildtype (parent sequence)
     - **traj_{num_mut}mut_v{i}.png**: plots scores vs. step for trial
   
-## Step 3: SFT
+### Step 3: SFT
 Supervise finetune pLM
 
 ```python3 running_SFT.py > running_SFT.out```
@@ -61,7 +66,7 @@ Files generated:
   - metrics and hyperparameters for each reward model
   - single_mutant_probability_heatmaps: single mutant probabilities from pretrained or SFT pLM for wildtype sequenece or amino acid sequence with high confidence mutations
 
-## Step 4: PPO
+### Step 4: PPO
 Align SFT-pLM with proximal policy optimization
 
 ```python3 running_PPO.py > running_PPO.out```
@@ -92,3 +97,14 @@ Files generated:
   - transformers              4.40.1
   - matplotlib
   - scikit-learn
+ 
+## 📬 Contact Me
+If you have questions about this repository or encounter any issues, feel free to reach out:
+
+Email: nlb51@duke.edu
+
+GitHub Issues: Open an Issue
+
+I welcome contributions, questions, and discussions related to RLXF.
+ 
+
