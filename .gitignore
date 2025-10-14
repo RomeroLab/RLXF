@@ -177,3 +177,5 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 **/.DS_Store
+reward_model_analysis/creilov/data/creilov_merged.csv
+reward_model_analysis/gb1/data/gb1_merged.csv
