@@ -183,8 +183,12 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 **/.DS_Store
+
+# repo specific drops
 reward_model_analysis/creilov/data/creilov_merged.csv
 reward_model_analysis/gb1/data/gb1_merged.csv
 reward_model_analysis/*/results/low_N*
 **/data/*.csv
 **/results/*.csv
+*.svg
+*.csv
