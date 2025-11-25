@@ -6,6 +6,9 @@ __pycache__/
 # ignore log files from server runs
 *.out
 
+# ignore subprocess bash scripts
+*.sh
+
 # ignore notebooks
 *.ipynb
 
