@@ -6,6 +6,12 @@ __pycache__/
 # ignore log files from server runs
 *.out
 
+# ignore subprocess bash scripts
+*.sh
+
+# ignore notebooks
+*.ipynb
+
 # ignore large model files
 *.ckpt
 *.pt
@@ -181,8 +187,20 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 **/.DS_Store
+<<<<<<< HEAD
 reward_model_analysis/creilov/data/creilov_merged.csv
 reward_model_analysis/gb1/data/gb1_merged.csv
 
 # notebooks./
 paper_analysis/*/generating_splits.ipynb
+=======
+
+# repo specific drops
+reward_model_analysis/creilov/data/creilov_merged.csv
+reward_model_analysis/gb1/data/gb1_merged.csv
+reward_model_analysis/*/results/low_N*
+**/data/*.csv
+**/results/*.csv
+*.svg
+*.csv
+>>>>>>> main

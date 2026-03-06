@@ -28,7 +28,12 @@ class SeqSeqDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         sequence = self.data_df.iloc[idx]['Masked_Sequence']  # Extract masked sequence at index idx
-        labels = self.data_df.iloc[idx]['Sequence']  # Extract original sequence at index idx
+        if 'Sequence' in self.data_df.columns:
+            labels = self.data_df.loc[idx, 'Sequence']
+        elif 'sequence' in self.data_df.columns:
+            labels = self.data_df.loc[idx, 'sequence']
+        else:
+            raise KeyError("Neither 'Sequence' nor 'sequence' column found in DataFrame.")
         return sequence, labels
 
     def __len__(self):
@@ -259,7 +264,3 @@ class SFT_ESM2(pl.LightningModule):
             print(f"Model saved to {filepath}")
         except Exception as e:
             print(f"An error occurred while saving the model: {e}")
-
-
-
-
