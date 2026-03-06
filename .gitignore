@@ -19,6 +19,7 @@ __pycache__/
 # ignore large files
 paper_analysis/CreiLOV/vae/designs/vae_designs/version_507/sorted_mutant_designs_scores_mutations.csv
 paper_analysis/CreiLOV/vae/designs/vae_designs/version_507/final_100000_designs_from_vae_v507.csv
+*.csv
 
 # C extensions
 *.so
