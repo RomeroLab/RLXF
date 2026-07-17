@@ -7,6 +7,8 @@ Check out our preprint here: https://www.biorxiv.org/content/10.1101/2025.05.02.
 
 ![Figure_1](https://github.com/user-attachments/assets/ebb952ce-137d-4af5-96da-d360a0d85370)
 
+[![DOI](https://zenodo.org/badge/940702436.svg)](https://doi.org/10.5281/zenodo.21420320)
+
 ## Performing RLXF
 Perform the following steps to functionally align the protein language model (pLM) **ESM-2**.
 
