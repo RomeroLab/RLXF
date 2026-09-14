@@ -5,7 +5,7 @@ Reinforcement Learning from eXperimental Feedback (RLXF) is a framework for alig
 
 We applied RLXF across five diverse protein classes to demonstrate its generalizability and effectiveness at generating optimized sequences by learning functional constraints beyond those captured during pre-training. As an in-depth case study, we aligned the 650M parameter ESM-2 model to experimental fluorescence data from the CreiLOV flavin-binding fluorescent protein. The aligned model learned to prioritize mutations that enhance fluorescence, many of which were missed by the base model. Experimental validation revealed the RLXF-aligned model generates a higher fraction of functional sequences, a greater number of sequences more fluorescent than CreiLOV, and the brightest oxygen-independent fluorescent protein variant reported to date. We provide data from these studies in the directory **`paper_analysis`**.
 
-Check out our preprint here: https://www.biorxiv.org/content/10.1101/2025.05.02.651993v1.article-metrics
+Check out our paper here: https://www.nature.com/articles/s41467-026-77557-2
 
 ![Figure_1](https://github.com/user-attachments/assets/ebb952ce-137d-4af5-96da-d360a0d85370)
 
